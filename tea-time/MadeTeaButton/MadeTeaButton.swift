@@ -9,7 +9,7 @@ struct MadeTeaButton: View {
         VStack (spacing: 20) {
             Button {
                 Task {
-                    await beginTimer(length: 5) // todo - fix to be 15 * 60
+                    await beginTimer(length: 15 * 60)
                 }
             } label: {
                 Text("Made tea! (15 mins)").foregroundStyle(blackTea)
@@ -20,7 +20,7 @@ struct MadeTeaButton: View {
             
             Button {
                 Task {
-                    await beginTimer(length: 10) // todo - fix time to be 20 * 60
+                    await beginTimer(length: 20 * 60)
                 }
             } label: {
                 Text("Made tea! (20 mins)").foregroundStyle(reallyMilkyTea)
