@@ -1,12 +1,12 @@
 import SwiftUI
 
-let reallyMilkyTea = Color(red: 204/255, green: 172/255, blue: 133/255)
+let reallyMilkyTea = Color(red: 176/255, green: 155/255, blue: 137/255)
 let milkyTea = Color(red: 184/255, green: 145/255, blue:109/255)
 let blackTea = Color(red: 69/255, green: 42/255, blue: 22/255)
 
 struct MadeTeaButton: View {
     var body: some View {
-        VStack {
+        VStack (spacing: 20) {
             Button {
                 Task {
                     await beginTimer(length: 5) // todo - fix to be 15 * 60
