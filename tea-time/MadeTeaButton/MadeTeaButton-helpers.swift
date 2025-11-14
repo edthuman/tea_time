@@ -36,6 +36,9 @@ func createNotification(timeDelay: Double) -> UNNotificationRequest {
     content.title = "Tea Alert"
     content.body = "15 minutes begins now..."
     
+    let soundName = UNNotificationSoundName(rawValue: "_mary.wav")
+    content.sound = UNNotificationSound(named: soundName)
+    
     let trigger = UNTimeIntervalNotificationTrigger(timeInterval: timeDelay, repeats: false)
     let request = UNNotificationRequest(identifier: uuid, content: content, trigger: trigger)
     return request
