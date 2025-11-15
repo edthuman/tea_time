@@ -8,13 +8,21 @@ func printWithNewlineAbove(input: Any) {
 
 /// starts a timer of the given length of seconds
 /// use of seconds means incomplete - e.g. half/quarter minutes are easier to generate
-func beginTimer(length: Double) async {
-    printWithNewlineAbove(input: "Creating a timer for \(length) seconds...")
+func beginTimer(length: Double) async {    
+    var timeToShow: String
+    if (length == 1.0) {
+        timeToShow = "1 second"
+    } else if (length < 60) {
+        timeToShow = "\(Int(length)) seconds"
+    } else {
+        let minutes = Int(length / 60)
+        timeToShow = minutes == 1 ? "1 minute" : "\(minutes) minutes"
+    }
     
     // notification to show that timer has started
     let startNotif = createNotification(
         title: "Timer started!",
-        description: "Tea minus \(length) minutes...",
+        description: "Tea minus \(timeToShow)...",
         playSound: false,
         timeDelay: nil
     )

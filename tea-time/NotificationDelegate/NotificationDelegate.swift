@@ -1,7 +1,6 @@
 import UserNotifications
 
 class NotificationDelegate: NSObject, UNUserNotificationCenterDelegate, ObservableObject {
-    
     // called when a notification is delivered whilst the app is open
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification,
