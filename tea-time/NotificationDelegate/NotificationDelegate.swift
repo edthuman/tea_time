@@ -12,7 +12,6 @@ class NotificationDelegate: NSObject, UNUserNotificationCenterDelegate, Observab
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
-        printWithNewlineAbove(input: "User tapped the notification!")
         completionHandler()
     }
 }

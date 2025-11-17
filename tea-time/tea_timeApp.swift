@@ -18,7 +18,7 @@ struct tea_timeApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AppContent()
         }
     }
 }
