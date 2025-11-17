@@ -10,7 +10,7 @@ struct AppContent: View {
         } else {
             VStack {
                 BackButton()
-                MadeTeaButton()
+                MadeTeaButtons()
             }
         }
     }
