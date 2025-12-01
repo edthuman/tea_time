@@ -8,6 +8,22 @@ func setFolder(folder: String) {
     appState.setFolder(selectedFolder: folder)
 }
 
+struct SettingsButton: View {
+    var body: some View {
+        ZStack (alignment: .trailing){
+            Button {
+                Task {
+                    setFolder(folder: "Settings")
+                }
+            } label: {
+                Text("⚙️")
+                    .foregroundStyle(Color.black)
+            }
+            .frame(maxWidth: .infinity, alignment: .trailing)
+        }.padding(.trailing, 20)
+    }
+}
+
 struct TimerFolders: View {
     var body: some View {
         VStack (spacing: 20) {
@@ -31,5 +47,7 @@ struct TimerFolders: View {
             }.padding(20)
                 .background(fbiBlue, in: RoundedRectangle(cornerRadius: 12))
         }
+        .padding(.bottom, 50)
+        .frame(height: 730)
     }
 }
