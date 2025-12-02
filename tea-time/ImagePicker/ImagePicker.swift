@@ -10,6 +10,7 @@ struct ImagePicker: UIViewControllerRepresentable {
         let picker = UIImagePickerController()
         picker.delegate = context.coordinator
         picker.sourceType = .photoLibrary
+        picker.allowsEditing = true
         return picker
     }
 
@@ -30,7 +31,7 @@ struct ImagePicker: UIViewControllerRepresentable {
 
         // Called when an image is selected
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-            if let uiImage = info[.originalImage] as? UIImage {
+            if let uiImage = info[.editedImage] as? UIImage {
                 // Save the selected image to the bound property
                 parent.selectedImage = uiImage
             }
