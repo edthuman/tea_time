@@ -8,7 +8,8 @@ struct AppContent: View {
         if (state.folder.count == 0) {
             VStack {
                 SettingsButton()
-                TimerFolders()
+                Folders()
+                AddFolderButton()
             }
         } else if (state.folder == "Settings") {
                 BackButton()

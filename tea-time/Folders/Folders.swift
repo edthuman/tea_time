@@ -1,32 +1,45 @@
 import SwiftUI
+import CoreData
 
 let white = Color(red: 255/255, green: 255/255, blue: 255/255)
 let fbiPurple = Color(red: 162/255, green: 132/255, blue: 192/255)
 let fbiBlue = Color(red: 96/255, green: 116/255, blue: 167/255)
 
+let getFolders: NSFetchRequest = {
+    let request = Folder.fetchRequest()
+    request.sortDescriptors = [NSSortDescriptor(keyPath: \Folder.folderName, ascending: true)]
+    return request
+}()
+
 func setFolder(folder: String) {
     appState.setFolder(selectedFolder: folder)
 }
 
-struct SettingsButton: View {
+struct Folders: View {
+    @Environment(\.managedObjectContext) private var viewContext
+    @FetchRequest(fetchRequest: getFolders) private var folders: FetchedResults<Folder>
+    
     var body: some View {
-        ZStack (alignment: .trailing){
-            Button {
-                Task {
-                    setFolder(folder: "Settings")
-                }
-            } label: {
-                Text("⚙️")
-                    .foregroundStyle(Color.black)
+        List {
+            ForEach(folders, id: \.id) { folder in
+                Text(folder.folderName ?? "Timers")
             }
-            .frame(maxWidth: .infinity, alignment: .trailing)
-        }.padding(.trailing, 20)
-    }
-}
-
-struct TimerFolders: View {
-    var body: some View {
-        AddFolderButton()
+            .onDelete { indexSet in
+                withAnimation {
+                    indexSet.forEach { index in
+                        let folderToDelete = folders[index]
+                        viewContext.delete(folderToDelete)
+                    }
+                    
+                    do {
+                        try viewContext.save()
+                    } catch {
+                        let nsError = error as NSError
+                        fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+                    }
+                }
+            }
+        }
     }
 }
 
