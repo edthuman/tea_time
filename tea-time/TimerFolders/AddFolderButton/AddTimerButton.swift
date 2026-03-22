@@ -38,8 +38,23 @@ struct AddFolderButton: View {
         }
 
         List {
-            ForEach(folders) { folder in
-                Text(folder.folderName ?? "Timers").foregroundColor(.blue)
+            ForEach(folders, id: \.id) { folder in
+                Text(folder.folderName ?? "Timers")
+            }
+            .onDelete { indexSet in
+                withAnimation {
+                    indexSet.forEach { index in
+                        let folderToDelete = folders[index]
+                        viewContext.delete(folderToDelete)
+                    }
+                    
+                    do {
+                        try viewContext.save()
+                    } catch {
+                        let nsError = error as NSError
+                        fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+                    }
+                }
             }
         }.background(Color.yellow)
     }
