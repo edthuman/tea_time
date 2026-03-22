@@ -26,6 +26,13 @@ struct SettingsButton: View {
 
 struct TimerFolders: View {
     var body: some View {
+        AddFolderButton()
+    }
+}
+
+// EDTODO - Save these details in Core Data Model
+struct MaryAndEdButtons: View {
+    var body: some View {
         VStack (spacing: 20) {
             Button {
                 Task {
@@ -33,7 +40,6 @@ struct TimerFolders: View {
                 }
             } label: {
                 Text("Timer for Mary").foregroundStyle(white).fontWeight(.medium)
-                
             }
             .padding(20)
             .background(fbiPurple, in: RoundedRectangle(cornerRadius: 12))

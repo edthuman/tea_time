@@ -4,6 +4,8 @@ private let notificationDelegate = NotificationDelegate()
 
 @main
 struct tea_timeApp: App {
+    let persistenceController = PersistenceController.shared
+    
     init () {
         UNUserNotificationCenter.current().delegate = notificationDelegate
         
@@ -18,7 +20,7 @@ struct tea_timeApp: App {
     
     var body: some Scene {
         WindowGroup {
-            AppContent()
+            AppContent().environment(\.managedObjectContext, persistenceController.container.viewContext)
         }
     }
 }

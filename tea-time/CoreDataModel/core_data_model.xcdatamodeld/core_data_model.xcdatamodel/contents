@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788.4" systemVersion="24E263" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
+    <entity name="Folder" representedClassName="Folder" syncable="YES" codeGenerationType="class">
+        <attribute name="folderName" optional="YES" attributeType="String"/>
+        <relationship name="timers" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Timer" inverseName="folder" inverseEntity="Timer"/>
+    </entity>
+    <entity name="Timer" representedClassName="Timer" syncable="YES" codeGenerationType="class">
+        <attribute name="colour" optional="YES" attributeType="String"/>
+        <attribute name="seconds" optional="YES" attributeType="Integer 64" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="timerName" optional="YES" attributeType="String"/>
+        <relationship name="folder" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Folder" inverseName="timers" inverseEntity="Folder"/>
+    </entity>
+</model>
