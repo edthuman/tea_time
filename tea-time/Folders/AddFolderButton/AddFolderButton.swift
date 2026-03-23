@@ -5,6 +5,7 @@ struct AddFolderButton: View {
     @Environment(\.managedObjectContext) private var viewContext
     
     @State private var newFolderName: String = ""
+    @State private var isAdding: Bool = false
 
     func addFolder () {
         withAnimation {
@@ -14,6 +15,7 @@ struct AddFolderButton: View {
             do {
                 try viewContext.save()
                 newFolderName = ""
+                isAdding.toggle()
             } catch {
                 // EDTODO - Replace this implementation with code to handle the error appropriately.
                 // fatalError terminates the app and creates a crash log
@@ -24,10 +26,17 @@ struct AddFolderButton: View {
     }
     
     var body: some View {
-        TextField("Folder Name", text: $newFolderName)
-        
-        Button(action: addFolder) {
-            Text("Create Folder")
+        Button {
+            isAdding.toggle()
+        } label: {
+            Text("+")
+        }
+        .sheet(isPresented: $isAdding) {
+            TextField("Folder Name", text: $newFolderName)
+            
+            Button(action: addFolder) {
+                Text("Create Folder")
+            }
         }
     }
 }
