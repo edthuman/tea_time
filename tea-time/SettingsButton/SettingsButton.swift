@@ -5,7 +5,7 @@ struct SettingsButton: View {
         ZStack (alignment: .trailing){
             Button {
                 Task {
-                    setFolder(folder: "Settings")
+                    setPage(page: "Settings")
                 }
             } label: {
                 Text("⚙️")

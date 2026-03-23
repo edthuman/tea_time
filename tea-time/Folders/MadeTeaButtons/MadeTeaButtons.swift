@@ -7,6 +7,7 @@ let homeButtonColor: Color = Color(red: 69/255, green: 42/255, blue: 22/255)
 
 func backHome() {
     appState.setFolder(selectedFolder: "")
+    appState.setPage(selectedPage: "")
 }
 
 struct BackButton: View {
