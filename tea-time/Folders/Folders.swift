@@ -1,15 +1,10 @@
 import SwiftUI
 import CoreData
 
+let black = Color(red: 0/255, green: 0/255, blue: 0/255)
 let white = Color(red: 255/255, green: 255/255, blue: 255/255)
 let fbiPurple = Color(red: 162/255, green: 132/255, blue: 192/255)
 let fbiBlue = Color(red: 96/255, green: 116/255, blue: 167/255)
-
-let getFolders: NSFetchRequest = {
-    let request = Folder.fetchRequest()
-    request.sortDescriptors = [NSSortDescriptor(keyPath: \Folder.folderName, ascending: true)]
-    return request
-}()
 
 func setFolder(folder: String) {
     appState.setFolder(selectedFolder: folder)
@@ -17,54 +12,38 @@ func setFolder(folder: String) {
 
 struct Folders: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @FetchRequest(fetchRequest: getFolders) private var folders: FetchedResults<Folder>
-    
-    var body: some View {
-        List {
-            ForEach(folders, id: \.id) { folder in
-                Text(folder.folderName ?? "Timers")
-            }
-            .onDelete { indexSet in
-                withAnimation {
-                    indexSet.forEach { index in
-                        let folderToDelete = folders[index]
-                        viewContext.delete(folderToDelete)
-                    }
-                    
-                    do {
-                        try viewContext.save()
-                    } catch {
-                        let nsError = error as NSError
-                        fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-                    }
-                }
-            }
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \Folder.folderName, ascending: true)],
+        animation: .default
+    )
+    private var folders: FetchedResults<Folder>
+
+    private func colorForFolder(_ name: String) -> Color {
+        switch name {
+        case "Mary":
+            return fbiPurple
+        case "Ed":
+            return fbiBlue
+        default:
+            return black
         }
     }
-}
-
-// EDTODO - Save these details in Core Data Model
-struct MaryAndEdButtons: View {
+    
     var body: some View {
         VStack (spacing: 20) {
-            Button {
-                Task {
-                    setFolder(folder: "Mary")
+            ForEach(folders) { folder in
+                let folderName: String = folder.folderName ?? ""
+                
+                Button {
+                    setFolder(folder: folderName)
+                } label: {
+                    Text(folderName).foregroundStyle(white).fontWeight(.medium)
                 }
-            } label: {
-                Text("Timer for Mary").foregroundStyle(white).fontWeight(.medium)
+                .padding(20)
+                .background(
+                    colorForFolder(folderName), in: RoundedRectangle(cornerRadius: 12)
+                )
             }
-            .padding(20)
-            .background(fbiPurple, in: RoundedRectangle(cornerRadius: 12))
-            
-            Button {
-                Task {
-                    setFolder(folder: "Ed")
-                }
-            } label: {
-                Text("Timer for Ed").foregroundStyle(white).fontWeight(.medium)
-            }.padding(20)
-                .background(fbiBlue, in: RoundedRectangle(cornerRadius: 12))
         }
         .padding(.bottom, 50)
         .frame(height: 730)
