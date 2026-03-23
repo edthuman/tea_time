@@ -30,22 +30,28 @@ struct Folders: View {
     }
     
     var body: some View {
-        VStack (spacing: 20) {
-            ForEach(folders) { folder in
-                let folderName: String = folder.folderName ?? ""
-                
-                Button {
-                    setFolder(folder: folderName)
-                } label: {
-                    Text(folderName).foregroundStyle(white).fontWeight(.medium)
+        GeometryReader { geometry in
+            let screenWidth = geometry.size.width
+            
+            VStack (spacing: 20) {
+                ForEach(folders) { folder in
+                    let folderName: String = folder.folderName ?? ""
+                    
+                    Button {
+                        setFolder(folder: folderName)
+                    } label: {
+                        Text(folderName).foregroundStyle(white).fontWeight(.bold)
+                            .frame(maxWidth: screenWidth * 0.3)
+                    }
+                    .padding(20)
+                    .background(
+                        colorForFolder(folderName), in: RoundedRectangle(cornerRadius: 12)
+                    )
                 }
-                .padding(20)
-                .background(
-                    colorForFolder(folderName), in: RoundedRectangle(cornerRadius: 12)
-                )
             }
+            .frame(width: screenWidth)
+            .padding(.bottom, 50)
+            .frame(height: 730)
         }
-        .padding(.bottom, 50)
-        .frame(height: 730)
     }
 }
