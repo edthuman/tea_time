@@ -29,7 +29,15 @@ struct AddFolderButton: View {
         Button {
             isAdding.toggle()
         } label: {
-            Text("+")
+            Image(systemName: "plus")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(.black)
+                .frame(width: 30, height: 30)
+                .overlay(
+                    Circle()
+                        .stroke(Color.black, lineWidth: 2)
+                )
+                .contentShape(Circle())
         }
         .sheet(isPresented: $isAdding) {
             TextField("Folder Name", text: $newFolderName)
