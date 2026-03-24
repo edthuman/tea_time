@@ -40,7 +40,6 @@ struct Folders: View {
             VStack (spacing: 20) {
                 ForEach(folders) { folder in
                     let folderName: String = folder.folderName ?? ""
-                    
                     Button {
                         setFolder(folder: folderName)
                     } label: {
@@ -49,7 +48,10 @@ struct Folders: View {
                     }
                     .padding(20)
                     .background(
-                        colorForFolder(folderName), in: RoundedRectangle(cornerRadius: 12)
+                        Color(
+                            red: folder.red, green: folder.green, blue: folder.blue
+                        ),
+                        in: RoundedRectangle(cornerRadius: 12)
                     )
                 }
                 
