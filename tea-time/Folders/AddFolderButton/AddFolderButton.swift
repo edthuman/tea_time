@@ -5,20 +5,18 @@ func hexToDouble(_ hex: String) -> Double {
    return (Double(hex) ?? 0) / 255.0
 }
 
+let initialColor: Color = Color(red: 1, green: 0.5255, blue: 0.2824)
+
 struct AddFolderButton: View {
     @Environment(\.managedObjectContext) private var viewContext
     
     @State private var isAdding: Bool = false
     @State private var newFolderName: String = ""
-    @State private var newFolderRed: String = ""
-    @State private var newFolderGreen: String = ""
-    @State private var newFolderBlue: String = ""
+    @State private var newFolderBackground: Color = initialColor
     
     private func resetState() {
         newFolderName = ""
-        newFolderRed = ""
-        newFolderGreen = ""
-        newFolderBlue = ""
+        newFolderBackground = initialColor
         isAdding.toggle()
     }
     
@@ -26,9 +24,11 @@ struct AddFolderButton: View {
         withAnimation {
             let newItem = Folder(context: viewContext)
             newItem.folderName = newFolderName
-            newItem.red = hexToDouble(newFolderRed)
-            newItem.green = hexToDouble(newFolderGreen)
-            newItem.blue = hexToDouble(newFolderBlue)
+            
+            let resolvedColor = UIColor(newFolderBackground).cgColor.components
+            newItem.red = Double(resolvedColor?[0] ?? 0)
+            newItem.green = Double(resolvedColor?[1] ?? 0)
+            newItem.blue = Double(resolvedColor?[2] ?? 0)
 
             do {
                 try viewContext.save()
@@ -58,30 +58,43 @@ struct AddFolderButton: View {
         }
         .sheet(isPresented: $isAdding) {
             GeometryReader { geometry in
+                let screenWidth = geometry.size.width
+                let screenHeight = geometry.size.height
+                
                 VStack {
                     TextField("Folder Name", text: $newFolderName)
+                        .frame(maxWidth: screenWidth * 0.3)
                         .multilineTextAlignment(.center)
-                        .frame(width: geometry.size.width * 0.6)
-
-                    TextField("Red", text: $newFolderRed)
-                        .multilineTextAlignment(.center)
-                        .frame(width: geometry.size.width * 0.6)
+                        .foregroundStyle(white)
+                        .fontWeight(newFolderName == "" ? .regular : .bold)
+                        .padding(20)
+                        .background(
+                            newFolderBackground,
+                            in: RoundedRectangle(cornerRadius: 12)
+                        )
                     
-                    TextField("Green", text: $newFolderGreen)
-                        .multilineTextAlignment(.center)
-                        .frame(width: geometry.size.width * 0.6)
+                    ColorPicker("Background Color", selection: $newFolderBackground)
+                        .frame(width: screenWidth * 0.45)
+                        .padding(.vertical, 10)
                     
-                    TextField("Blue", text: $newFolderBlue)
-                        .multilineTextAlignment(.center)
-                        .frame(width: geometry.size.width * 0.6)
-                    
-                    Button(action: addFolder) {
-                        Text("Create Folder")
+                    HStack {
+                        Button(action: resetState) {
+                            Text("Cancel")
+                                .foregroundStyle(.red)
+                        }
+                        .padding(.trailing, 20)
+                        
+                        
+                        Button(action: addFolder) {
+                            Text("Confirm")
+                        }
                     }
+                    
+                    
                 }
                 .frame(
-                    width: geometry.size.width,
-                    height: geometry.size.height * 0.95
+                    width: screenWidth,
+                    height: screenHeight * 0.95
                 )
             }
         }
