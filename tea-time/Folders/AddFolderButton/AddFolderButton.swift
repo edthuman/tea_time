@@ -5,18 +5,20 @@ func hexToDouble(_ hex: String) -> Double {
    return (Double(hex) ?? 0) / 255.0
 }
 
-let initialColor: Color = Color(red: 1, green: 0.5255, blue: 0.2824)
+let initialBgColor: Color = Color(red: 1, green: 0.5255, blue: 0.2824)
 
 struct AddFolderButton: View {
     @Environment(\.managedObjectContext) private var viewContext
     
     @State private var isAdding: Bool = false
     @State private var newFolderName: String = ""
-    @State private var newFolderBackground: Color = initialColor
+    @State private var newTextColour: Color = .white
+    @State private var newFolderBackground: Color = initialBgColor
     
     private func resetState() {
         newFolderName = ""
-        newFolderBackground = initialColor
+        newTextColour = .white
+        newFolderBackground = initialBgColor
         isAdding.toggle()
     }
     
@@ -25,10 +27,15 @@ struct AddFolderButton: View {
             let newItem = Folder(context: viewContext)
             newItem.folderName = newFolderName
             
-            let resolvedColor = UIColor(newFolderBackground).cgColor.components
-            newItem.red = Double(resolvedColor?[0] ?? 0)
-            newItem.green = Double(resolvedColor?[1] ?? 0)
-            newItem.blue = Double(resolvedColor?[2] ?? 0)
+            let textColor = UIColor(newTextColour).cgColor.components
+            newItem.textRed = Double(textColor?[0] ?? 0)
+            newItem.textGreen = Double(textColor?[1] ?? 0)
+            newItem.textBlue = Double(textColor?[2] ?? 0)
+            
+            let bgColor = UIColor(newFolderBackground).cgColor.components
+            newItem.bgRed = Double(bgColor?[0] ?? 0)
+            newItem.bgGreen = Double(bgColor?[1] ?? 0)
+            newItem.bgBlue = Double(bgColor?[2] ?? 0)
 
             do {
                 try viewContext.save()
@@ -65,13 +72,17 @@ struct AddFolderButton: View {
                     TextField("Folder Name", text: $newFolderName)
                         .frame(maxWidth: screenWidth * 0.3)
                         .multilineTextAlignment(.center)
-                        .foregroundStyle(white)
+                        .foregroundStyle(newTextColour)
                         .fontWeight(newFolderName == "" ? .regular : .bold)
                         .padding(20)
                         .background(
                             newFolderBackground,
                             in: RoundedRectangle(cornerRadius: 12)
                         )
+                    
+                    ColorPicker("Text Color", selection: $newTextColour)
+                        .frame(width: screenWidth * 0.45)
+                        .padding(.vertical, 10)
                     
                     ColorPicker("Background Color", selection: $newFolderBackground)
                         .frame(width: screenWidth * 0.45)
@@ -84,13 +95,10 @@ struct AddFolderButton: View {
                         }
                         .padding(.trailing, 20)
                         
-                        
                         Button(action: addFolder) {
                             Text("Confirm")
                         }
-                    }
-                    
-                    
+                    }  
                 }
                 .frame(
                     width: screenWidth,
