@@ -82,6 +82,7 @@ struct AddFolderButton: View {
                     
                     ColorPicker("Text Color", selection: $newTextColour)
                         .frame(width: screenWidth * 0.45)
+                        .padding(.top, 5)
                         .padding(.vertical, 10)
                     
                     ColorPicker("Background Color", selection: $newFolderBackground)
@@ -98,7 +99,8 @@ struct AddFolderButton: View {
                         Button(action: addFolder) {
                             Text("Confirm")
                         }
-                    }  
+                    }
+                    .padding(.top, 5)
                 }
                 .frame(
                     width: screenWidth,
