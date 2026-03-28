@@ -19,7 +19,7 @@ struct AddFolderButton: View {
                 .contentShape(Circle())
         }
         .sheet(isPresented: $isAdding) {
-            EditFolderForm(isNew: true)
+            EditFolderForm(isPresented: $isAdding)
         }
     }
 }

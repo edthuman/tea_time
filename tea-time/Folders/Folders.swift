@@ -33,6 +33,7 @@ func getFolderButton(folder: Folder) -> some View {
 
 struct Folders: View {
     @ObservedObject var state = appState
+    @State var showEditFolderForm: Bool = false
     
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(
@@ -46,13 +47,19 @@ struct Folders: View {
             let screenWidth = geometry.size.width
             
             VStack (spacing: 20) {
-                ForEach(folders) { folder in
+                ForEach(folders) { (folder: Folder) in
                     if (state.isEditingFolders) {
                         HStack {
                             getFolderButton(folder: folder)
-                            Image(systemName: "square.and.pencil")
-                                .foregroundStyle(.blue)
-                                .padding(.horizontal, 10)
+
+                            Button {
+                                state.setFolderBeingEdited(folder)
+                                showEditFolderForm = true
+                            } label: {
+                                Image(systemName: "square.and.pencil")
+                                    .foregroundStyle(.blue)
+                                    .padding(.horizontal, 10)
+                            }
                             
                             Image(systemName: "trash")
                                 .foregroundStyle(.red)
@@ -67,6 +74,9 @@ struct Folders: View {
             .frame(width: screenWidth)
             .padding(.bottom, 50)
             .frame(height: 730)
+            .sheet(isPresented: $showEditFolderForm) {
+                EditFolderForm(isPresented: $showEditFolderForm)
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreData
 
 func hexToDouble(_ hex: String) -> Double {
    return (Double(hex) ?? 0) / 255.0
@@ -7,20 +8,76 @@ func hexToDouble(_ hex: String) -> Double {
 let initialBgColor: Color = Color(red: 1, green: 0.5255, blue: 0.2824)
 
 struct EditFolderForm: View {
+    @ObservedObject var state = appState
     @Environment(\.managedObjectContext) private var viewContext
     
-    @State private var isAdding: Bool = false
-    @State private var newFolderName: String = ""
-    @State private var newTextColour: Color = .white
-    @State private var newFolderBackground: Color = initialBgColor
+    @Binding var isPresented: Bool
     
-    @State public var isNew: Bool?
+    @State private var isAdding: Bool
+    @State private var newFolderName: String
+    @State private var newTextColour: Color
+    @State private var newFolderBackground: Color
     
     private func resetState() {
         newFolderName = ""
         newTextColour = .white
         newFolderBackground = initialBgColor
         isAdding.toggle()
+        appState.setFolderBeingEdited(nil)
+        isPresented = false
+    }
+    
+    private func saveChanges () {
+        withAnimation {
+            let folder: Folder? = appState.folderBeingEdited
+  
+            let folderName = newFolderName
+            
+            let textColor = UIColor(newTextColour).cgColor.components
+            let textRed = Double(textColor?[0] ?? 0)
+            let textGreen = Double(textColor?[1] ?? 0)
+            let textBlue = Double(textColor?[2] ?? 0)
+            
+            let bgColor = UIColor(newFolderBackground).cgColor.components
+            let bgRed = Double(bgColor?[0] ?? 0)
+            let bgGreen = Double(bgColor?[1] ?? 0)
+            let bgBlue = Double(bgColor?[2] ?? 0)
+            
+            if let folder = folder {
+                // Update existing folder
+                folder.folderName = folderName
+
+                folder.textRed = textRed
+                folder.textGreen = textGreen
+                folder.textBlue = textBlue
+                
+                folder.bgRed = bgRed
+                folder.bgGreen = bgGreen
+                folder.bgBlue = bgBlue
+            } else {
+                // Create new folder
+                let newItem = Folder(context: viewContext)
+                newItem.folderName = folderName
+                
+                newItem.textRed = textRed
+                newItem.textGreen = textGreen
+                newItem.textBlue = textBlue
+                
+                newItem.bgRed = bgRed
+                newItem.bgGreen = bgGreen
+                newItem.bgBlue = bgBlue
+            }
+            
+            do {
+                try viewContext.save()
+                resetState()
+            } catch {
+                // EDTODO - Replace this implementation with code to handle the error appropriately.
+                // fatalError terminates the app and creates a crash log
+                let nsError = error as NSError
+                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+            }
+        }
     }
     
     private func addFolder () {
@@ -47,6 +104,21 @@ struct EditFolderForm: View {
                 let nsError = error as NSError
                 fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
             }
+        }
+    }
+    
+    init(isPresented: Binding<Bool>) {
+        self._isPresented = isPresented
+        let folder = appState.folderBeingEdited
+        _isAdding = State(initialValue: folder == nil)
+        _newFolderName = State(initialValue: folder?.folderName ?? "")
+        
+        if folder != nil {
+            _newTextColour = State(initialValue: Color(red: folder!.textRed, green: folder!.textGreen, blue: folder!.textBlue))
+            _newFolderBackground = State(initialValue: Color(red: folder!.bgRed, green: folder!.bgGreen, blue: folder!.bgBlue))
+        } else {
+            _newTextColour = State(initialValue: .white)
+            _newFolderBackground = State(initialValue: initialBgColor)
         }
     }
     
@@ -93,7 +165,7 @@ struct EditFolderForm: View {
                     }
                     .padding(.trailing, 20)
                     
-                    Button(action: addFolder) {
+                    Button(action: saveChanges) {
                         Text("Confirm")
                     }
                 }
