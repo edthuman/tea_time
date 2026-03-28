@@ -43,13 +43,16 @@ struct Folders: View {
                     Button {
                         setFolder(folder: folderName)
                     } label: {
-                        Text(folderName).foregroundStyle(white).fontWeight(.bold)
+                        Text(folderName)
+                            .foregroundStyle(
+                                Color(red: folder.textRed, green: folder.textGreen, blue: folder.textBlue))
+                            .fontWeight(.bold)
                             .frame(maxWidth: screenWidth * 0.3)
                     }
                     .padding(20)
                     .background(
                         Color(
-                            red: folder.red, green: folder.green, blue: folder.blue
+                            red: folder.bgRed, green: folder.bgGreen, blue: folder.bgBlue
                         ),
                         in: RoundedRectangle(cornerRadius: 12)
                     )
