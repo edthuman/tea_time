@@ -14,6 +14,27 @@ func setFolder(folder: String) {
     appState.setFolder(selectedFolder: folder)
 }
 
+func getButtonBody(folder: Folder) -> some View {
+    let folderName: String = folder.folderName ?? ""
+
+    return GeometryReader { geometry in
+        let screenWidth = geometry.size.width
+        
+        Text(folderName)
+            .foregroundStyle(
+                Color(red: folder.textRed, green: folder.textGreen, blue: folder.textBlue))
+            .fontWeight(.bold)
+            .frame(maxWidth: screenWidth * 0.3)
+            .padding(20)
+    }
+}
+
+func getButtonBackgroundColour(folder: Folder) -> Color {
+    return Color(
+        red: folder.bgRed, green: folder.bgGreen, blue: folder.bgBlue
+    )
+}
+
 struct Folders: View {
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(
@@ -39,21 +60,15 @@ struct Folders: View {
             
             VStack (spacing: 20) {
                 ForEach(folders) { folder in
-                    let folderName: String = folder.folderName ?? ""
+                    let folderName = folder.folderName ?? ""
+                    
                     Button {
                         setFolder(folder: folderName)
                     } label: {
-                        Text(folderName)
-                            .foregroundStyle(
-                                Color(red: folder.textRed, green: folder.textGreen, blue: folder.textBlue))
-                            .fontWeight(.bold)
-                            .frame(maxWidth: screenWidth * 0.3)
+                        getButtonBody(folder: folder)
                     }
-                    .padding(20)
                     .background(
-                        Color(
-                            red: folder.bgRed, green: folder.bgGreen, blue: folder.bgBlue
-                        ),
+                        getButtonBackgroundColour(folder: folder),
                         in: RoundedRectangle(cornerRadius: 12)
                     )
                 }
