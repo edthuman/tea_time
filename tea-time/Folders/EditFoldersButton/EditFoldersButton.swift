@@ -1,15 +1,12 @@
 import SwiftUI
 
-struct SettingsButton: View {
+struct EditFoldersButton: View {
     var body: some View {
         ZStack (alignment: .trailing){
             Button {
-                Task {
-                    setPage(page: "Settings")
-                }
             } label: {
-                Text("⚙️")
-                    .foregroundStyle(Color.black)
+                Image(systemName: "square.and.pencil")
+                    .foregroundStyle(.blue)
             }
             .frame(maxWidth: .infinity, alignment: .trailing)
         }.padding(.trailing, 20)
