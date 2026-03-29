@@ -2,7 +2,7 @@ import SwiftUI
 
 func toggleIsEditingFolders() {
     let isEditingFolders = !appState.isEditingFolders
-    appState.setIsEditingFolders(isEditing: isEditingFolders)
+    appState.setIsEditingFolders(isEditingFolders)
 }
 
 struct EditFoldersButton: View {

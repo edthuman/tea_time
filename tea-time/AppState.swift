@@ -14,7 +14,7 @@ class AppState: ObservableObject {
         folder = selectedFolder
     }
     
-    func setIsEditingFolders(isEditing: Bool) {
+    func setIsEditingFolders(_ isEditing: Bool) {
         isEditingFolders = isEditing
     }
     
