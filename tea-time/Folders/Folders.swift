@@ -34,6 +34,7 @@ func getFolderButton(folder: Folder) -> some View {
 struct Folders: View {
     @ObservedObject var state = appState
     @State var showEditFolderForm: Bool = false
+    @State var showDelete: Bool = false
     
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(
@@ -61,8 +62,13 @@ struct Folders: View {
                                     .padding(.horizontal, 10)
                             }
                             
-                            Image(systemName: "trash")
-                                .foregroundStyle(.red)
+                            Button {
+                                state.setFolderBeingEdited(folder)
+                                showDelete = true
+                            } label: {
+                                Image(systemName: "trash")
+                                    .foregroundStyle(.red)
+                            }
                         }
                     } else {
                         getFolderButton(folder: folder)
@@ -77,6 +83,32 @@ struct Folders: View {
             .sheet(isPresented: $showEditFolderForm) {
                 EditFolderForm(isPresented: $showEditFolderForm)
             }
+        }
+        .alert(isPresented: $showDelete) {
+            let folder = state.folderBeingEdited
+            
+            
+            func hideAlert() {
+                showDelete = false
+            }
+            
+            func deleteFolder() {
+                if let folder = folder {
+                    viewContext.delete(folder)
+                }
+            }
+            
+            return Alert(
+                title: Text("You are about to delete \(folder?.folderName ?? "this folder")"),
+                primaryButton: .default(
+                    Text("Cancel"),
+                    action: hideAlert
+                ),
+                secondaryButton: .destructive(
+                    Text("Delete"),
+                    action: deleteFolder
+                )
+            )
         }
     }
 }
