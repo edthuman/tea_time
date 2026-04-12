@@ -11,9 +11,9 @@ struct AddFolderButton: View {
             isAdding.toggle()
         } label: {
             Image(systemName: "plus")
-                .font(.system(size: 12, weight: .bold))
+                .font(.system(size: 16, weight: .bold))
                 .foregroundStyle(.black)
-                .frame(width: 30, height: 30)
+                .frame(width: 36, height: 36)
                 .overlay(
                     Circle()
                         .stroke(Color.black, lineWidth: 2)
