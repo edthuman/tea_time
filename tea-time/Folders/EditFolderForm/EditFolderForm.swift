@@ -138,11 +138,11 @@ struct EditFolderForm: View {
             .padding(.trailing, 17)
 
             VStack {
-                TextField("Folder Name", text: $newFolderName)
+                TextField("Name", text: $newFolderName)
                     .frame(maxWidth: screenWidth * 0.3)
                     .multilineTextAlignment(.center)
                     .foregroundStyle(newTextColour)
-                    .fontWeight(newFolderName == "" ? .regular : .bold)
+                    .fontWeight(.bold)
                     .padding(20)
                     .background(
                         newFolderBackground,
