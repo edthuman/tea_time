@@ -59,8 +59,8 @@ struct Folders: View {
                         FoldersList(showEditFolderForm: $showEditFolderForm, showDelete: $showDelete, folders: folders)
                     }
                 }
-                .frame(height: screenHeight * 0.93)
-                .padding(.bottom, 20)
+                .frame(height: screenHeight * 0.94)
+                .padding(.bottom, 10)
                 
                 AddFolderButton()
             }
