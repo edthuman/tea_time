@@ -149,12 +149,12 @@ struct EditFolderForm: View {
                         in: RoundedRectangle(cornerRadius: 12)
                     )
                 
-                ColorPicker("Text Color", selection: $newTextColour)
+                ColorPicker("Text Colour", selection: $newTextColour)
                     .frame(width: screenWidth * 0.45)
                     .padding(.top, 5)
                     .padding(.vertical, 10)
                 
-                ColorPicker("Background Color", selection: $newFolderBackground)
+                ColorPicker("Background Colour", selection: $newFolderBackground)
                     .frame(width: screenWidth * 0.45)
                     .padding(.vertical, 10)
                 
