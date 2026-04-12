@@ -37,17 +37,26 @@ struct Folders: View {
     @State var showDelete: Bool = false
     
     @Environment(\.managedObjectContext) private var viewContext
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \Folder.folderName, ascending: true)],
+        animation: .default
+    )
+    private var folders: FetchedResults<Folder>
     
     var body: some View {
+        if (!folders.isEmpty) {
+            EditFoldersButton()
+        }
+            
         GeometryReader { geometry in
             let screenHeight = geometry.size.height
       
             VStack {
                 ViewThatFits {
-                    FoldersList(showEditFolderForm: $showEditFolderForm, showDelete: $showDelete)
+                    FoldersList(showEditFolderForm: $showEditFolderForm, showDelete: $showDelete, folders: folders)
                     
                     ScrollView {
-                        FoldersList(showEditFolderForm: $showEditFolderForm, showDelete: $showDelete)
+                        FoldersList(showEditFolderForm: $showEditFolderForm, showDelete: $showDelete, folders: folders)
                     }
                 }
                 .frame(height: screenHeight * 0.93)

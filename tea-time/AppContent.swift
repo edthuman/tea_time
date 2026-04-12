@@ -6,10 +6,7 @@ struct AppContent: View {
     
     var body: some View {
         if (state.folder.count == 0) {
-            VStack {
-                EditFoldersButton()
-                Folders()
-            }
+            Folders()
         } else {
             VStack {
                 BackButton()

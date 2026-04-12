@@ -4,12 +4,8 @@ struct FoldersList: View {
     @ObservedObject var state = appState
     @Binding var showEditFolderForm: Bool
     @Binding var showDelete: Bool
-
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Folder.folderName, ascending: true)],
-        animation: .default
-    )
-    private var folders: FetchedResults<Folder>
+    
+    let folders: FetchedResults<Folder>
     
     var body: some View {
         VStack (spacing: 20) {
