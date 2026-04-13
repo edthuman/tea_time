@@ -9,28 +9,6 @@ func setFolder(folder: String) {
     appState.setFolder(selectedFolder: folder)
 }
 
-func getFolderButton(folder: Folder) -> some View {
-    let screenWidth = UIScreen.main.bounds.width
-    let folderName = folder.folderName ?? ""
-    
-    return Button {
-        setFolder(folder: folderName)
-    } label: {
-        Text(folderName)
-            .foregroundStyle(
-                Color(red: folder.textRed, green: folder.textGreen, blue: folder.textBlue))
-            .fontWeight(.bold)
-            .frame(maxWidth: screenWidth * 0.3)
-            .padding(20)
-    }
-    .background(
-        Color(
-            red: folder.bgRed, green: folder.bgGreen, blue: folder.bgBlue
-        ),
-        in: RoundedRectangle(cornerRadius: 12)
-    )
-}
-
 struct Folders: View {
     @ObservedObject var state = appState
     @State var showEditFolderForm: Bool = false

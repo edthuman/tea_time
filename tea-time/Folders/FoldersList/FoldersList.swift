@@ -12,7 +12,7 @@ struct FoldersList: View {
             ForEach(folders) { (folder: Folder) in
                 if (state.isEditingFolders) {
                     HStack {
-                        getFolderButton(folder: folder)
+                        FolderButton(folder: folder)
                         
                         Button {
                             state.setFolderBeingEdited(folder)
@@ -32,7 +32,7 @@ struct FoldersList: View {
                         }
                     }
                 } else {
-                    getFolderButton(folder: folder)
+                    FolderButton(folder: folder)
                 }
             }
         }
