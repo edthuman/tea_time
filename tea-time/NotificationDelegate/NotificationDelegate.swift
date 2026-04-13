@@ -8,7 +8,7 @@ class NotificationDelegate: NSObject, UNUserNotificationCenterDelegate, Observab
         completionHandler([.banner, .sound, .badge])
     }
     
-    // todo - verify when this is triggered - supposed to be when a notification sent whilst app is in the background is clicked
+    // called when any notification is clicked
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {

@@ -6,7 +6,7 @@ struct AppContent: View {
     
     var body: some View {
         if (state.folder.count == 0) {
-            TimerFolders()
+            Folders()
         } else {
             VStack {
                 BackButton()
