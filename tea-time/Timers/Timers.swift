@@ -26,7 +26,7 @@ struct BackButton: View {
     }
 }
 
-struct MadeTeaButtons: View {
+struct Timers: View {
     var body: some View {
         VStack (spacing: 20) {
             Button {
