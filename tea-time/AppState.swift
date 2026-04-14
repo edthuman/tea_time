@@ -1,16 +1,11 @@
 import SwiftUI
 
 class AppState: ObservableObject {
-    @Published var page: String = ""
-    @Published var folder: String = ""
+    @Published var folder: String? = nil
     @Published var isEditingFolders: Bool = false
     @Published var folderBeingEdited: Folder? = nil
-
-    func setPage(selectedPage: String) {
-        page = selectedPage
-    }
     
-    func setFolder(selectedFolder: String) {
+    func setFolder(selectedFolder: String?) {
         folder = selectedFolder
     }
     

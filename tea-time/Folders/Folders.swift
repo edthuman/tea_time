@@ -1,11 +1,7 @@
 import SwiftUI
 import CoreData
 
-func setPage(page: String) {
-    appState.setPage(selectedPage: page)
-}
-
-func setFolder(folder: String) {
+func setFolder(folder: String?) {
     appState.setFolder(selectedFolder: folder)
 }
 

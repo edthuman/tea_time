@@ -5,7 +5,7 @@ struct AppContent: View {
     @ObservedObject var state = appState
     
     var body: some View {
-        if (state.folder.count == 0) {
+        if state.folder != nil {
             Folders()
         } else {
             VStack {
