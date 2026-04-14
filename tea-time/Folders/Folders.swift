@@ -25,16 +25,22 @@ struct Folders: View {
         if (!folders.isEmpty) {
             EditFoldersButton()
         }
-            
+
         GeometryReader { geometry in
             let screenHeight = geometry.size.height
-      
+            
             VStack {
-                ViewThatFits {
-                    FoldersList(showEditFolderForm: $showEditFolderForm, showDelete: $showDelete, folders: folders)
-                    
-                    ScrollView {
-                        FoldersList(showEditFolderForm: $showEditFolderForm, showDelete: $showDelete, folders: folders)
+                Group {
+                    if (folders.isEmpty) {
+                        EmptyFoldersList()
+                    } else {
+                        ViewThatFits {
+                            FoldersList(showEditFolderForm: $showEditFolderForm, showDelete: $showDelete, folders: folders)
+                            
+                            ScrollView {
+                                FoldersList(showEditFolderForm: $showEditFolderForm, showDelete: $showDelete, folders: folders)
+                            }
+                        }
                     }
                 }
                 .frame(height: screenHeight * 0.94)
@@ -42,13 +48,13 @@ struct Folders: View {
                 
                 AddFolderButton()
             }
+            .frame(maxWidth: .infinity)
         }
         .sheet(isPresented: $showEditFolderForm) {
             EditFolderForm(isPresented: $showEditFolderForm)
         }
         .alert(isPresented: $showDelete) {
             let folder = state.folderBeingEdited
-            
             
             func hideAlert() {
                 showDelete = false
