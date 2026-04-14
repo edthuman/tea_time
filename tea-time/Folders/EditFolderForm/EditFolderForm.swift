@@ -1,12 +1,6 @@
 import SwiftUI
 import CoreData
 
-func hexToDouble(_ hex: String) -> Double {
-   return (Double(hex) ?? 0) / 255.0
-}
-
-let initialBgColor: Color = Color(red: 1, green: 0.5255, blue: 0.2824)
-
 struct EditFolderForm: View {
     @ObservedObject var state = appState
     @Environment(\.managedObjectContext) private var viewContext
@@ -21,7 +15,7 @@ struct EditFolderForm: View {
     private func resetState() {
         newFolderName = ""
         newTextColour = .white
-        newFolderBackground = initialBgColor
+        newFolderBackground = .placeholderBackground
         isAdding.toggle()
         appState.setFolderBeingEdited(nil)
         isPresented = false
@@ -118,7 +112,7 @@ struct EditFolderForm: View {
             _newFolderBackground = State(initialValue: Color(red: folder!.bgRed, green: folder!.bgGreen, blue: folder!.bgBlue))
         } else {
             _newTextColour = State(initialValue: .white)
-            _newFolderBackground = State(initialValue: initialBgColor)
+            _newFolderBackground = State(initialValue: .placeholderBackground)
         }
     }
     
