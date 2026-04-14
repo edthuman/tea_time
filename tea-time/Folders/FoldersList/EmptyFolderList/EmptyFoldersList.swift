@@ -4,13 +4,11 @@ struct EmptyFoldersList: View {
     @ObservedObject var state = appState
     @State private var isAdding: Bool = false
     
-    let black: Color = Color("black_for_light")
-    
     var body: some View {
         VStack {
             Text("No folders")
                 .font(.system(size: 20, weight: .medium))
-                .foregroundStyle(black)
+                .foregroundStyle(.dynamicBlack)
         }
     }
 }
