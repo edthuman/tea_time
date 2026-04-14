@@ -5,7 +5,7 @@ class AppState: ObservableObject {
     @Published var isEditingFolders: Bool = false
     @Published var folderBeingEdited: Folder? = nil
     
-    func setFolder(selectedFolder: String?) {
+    func setFolder(_ selectedFolder: String?) {
         folder = selectedFolder
     }
     
@@ -15,6 +15,11 @@ class AppState: ObservableObject {
     
     func setFolderBeingEdited(_ folder: Folder?) {
         folderBeingEdited = folder
+    }
+    
+    func backToHome() {
+        setFolder(nil)
+        setIsEditingFolders(false)
     }
 }
 

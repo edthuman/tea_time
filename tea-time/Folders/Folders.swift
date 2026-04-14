@@ -2,7 +2,7 @@ import SwiftUI
 import CoreData
 
 func setFolder(folder: String?) {
-    appState.setFolder(selectedFolder: folder)
+    appState.setFolder(folder)
 }
 
 struct Folders: View {

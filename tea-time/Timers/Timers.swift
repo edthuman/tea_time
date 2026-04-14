@@ -5,16 +5,12 @@ let milkyTea = Color(red: 184/255, green: 145/255, blue:109/255)
 let blackTea = Color(red: 69/255, green: 42/255, blue: 22/255)
 let homeButtonColor: Color = Color(red: 69/255, green: 42/255, blue: 22/255)
 
-func backHome() {
-    appState.setFolder(selectedFolder: nil)
-}
-
 struct BackButton: View {
     var body: some View {
         ZStack (alignment: .trailing){
             Button {
                 Task {
-                    backHome()
+                    appState.backToHome()
                 }
             } label: {
                 Text("🏡 Home")
