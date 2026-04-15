@@ -10,7 +10,7 @@ struct FolderButton: View {
     
     var body: some View {
          Button {
-            setFolder(folder: folderName)
+            setFolder(folderName)
         } label: {
             Text(folderName)
                 .foregroundStyle(
