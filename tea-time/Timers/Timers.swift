@@ -21,30 +21,23 @@ struct BackButton: View {
     }
 }
 
+func setTimer(_ timer: String?) {
+    appState.setTimer(timer)
+}
+
 struct Timers: View {
+    @State var showEditTimerForm: Bool = false
+    
+    @Environment(\.managedObjectContext) private var viewContext
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \Timer.timerName, ascending: true)],
+        animation: .default
+    )
+    private var timers: FetchedResults<Timer>
+    
     var body: some View {
         VStack (spacing: 20) {
-            Button {
-                Task {
-                    await beginTimer(length: 15 * 60)
-                }
-            } label: {
-                Text("Made tea! (15 mins)").foregroundStyle(blackTea)
-                
-            }
-            .padding(20)
-            .background(milkyTea, in: RoundedRectangle(cornerRadius: 12))
-            
-            Button {
-                Task {
-                    await beginTimer(length: 20 * 60)
-                }
-            } label: {
-                Text("Made tea! (20 mins)").foregroundStyle(reallyMilkyTea)
-            }.padding(20)
-            .background(blackTea, in: RoundedRectangle(cornerRadius: 12))
+            TimersList(showEditTimerForm: $showEditTimerForm, timers: timers)
         }
-        .padding(.bottom, 50)
-        .frame(height: 730)
     }
 }
