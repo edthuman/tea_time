@@ -39,5 +39,7 @@ struct Timers: View {
         VStack (spacing: 20) {
             TimersList(showEditTimerForm: $showEditTimerForm, timers: timers)
         }
+        
+        AddTimerButton()
     }
 }

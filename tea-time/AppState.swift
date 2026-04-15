@@ -5,6 +5,7 @@ class AppState: ObservableObject {
     @Published var isEditingFolders: Bool = false
     @Published var folderBeingEdited: Folder? = nil
     @Published var timer: String? = nil
+    @Published var timerBeingEdited: Timer? = nil
     
     func setFolder(_ selectedFolder: String?) {
         folder = selectedFolder
@@ -25,6 +26,10 @@ class AppState: ObservableObject {
     
     func setTimer(_ selectedTimer: String?) {
         timer = selectedTimer
+    }
+    
+    func setTimerBeingEdited(_ timer: Timer?) {
+        timerBeingEdited = timer
     }
 }
 
