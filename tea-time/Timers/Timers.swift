@@ -14,7 +14,7 @@ struct BackButton: View {
                     appState.backToHome()
                 }
             } label: {
-                Text("🏡 Home")
+                Text("🏡")
                     .foregroundStyle(Color.black)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
