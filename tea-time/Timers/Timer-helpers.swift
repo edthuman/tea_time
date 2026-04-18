@@ -8,7 +8,7 @@ func printWithNewlineAbove(input: Any) {
 
 /// starts a timer of the given length of seconds
 /// use of seconds means incomplete - e.g. half/quarter minutes are easier to generate
-func beginTimer(length: Double) async {    
+func beginTimer(length: Double, timer: Timer) async {
     var timeToShow: String
     if (length == 1.0) {
         timeToShow = "1 second"
@@ -24,7 +24,8 @@ func beginTimer(length: Double) async {
         title: "Timer started!",
         description: "Tea minus \(timeToShow)...",
         playSound: false,
-        timeDelay: nil
+        timeDelay: nil,
+        timer: timer
     )
     
     // notification to show that timer has finished
@@ -32,7 +33,8 @@ func beginTimer(length: Double) async {
         title: "Tea time!",
         description: "🙂‍↕️🙂‍↕️🙂‍↕️",
         playSound: true,
-        timeDelay: length
+        timeDelay: length,
+        timer: timer
     )
 
     // send the notifications requests
@@ -45,12 +47,21 @@ func beginTimer(length: Double) async {
     }
 }
 
-func createNotification(title: String, description: String, playSound: Bool, timeDelay: Double?) -> UNNotificationRequest {
+func createNotification(title: String, description: String, playSound: Bool, timeDelay: Double?, timer: Timer) -> UNNotificationRequest {
     let uuid = UUID().uuidString
 
     let content = UNMutableNotificationContent()
     content.title = title
     content.body = description
+    
+    if (playSound && timer.folder?.folderName == "Mary") {
+            // add default sound to notification config
+            let soundName = UNNotificationSoundName(rawValue: "_mary.wav")
+            content.sound = UNNotificationSound(named: soundName)
+        } else if (playSound) {
+            let soundName = UNNotificationSoundName(rawValue: "_ed.wav")
+            content.sound = UNNotificationSound(named: soundName)
+        }
     
     if (timeDelay != nil) {
         // send notification to be sent after timer length passes

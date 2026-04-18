@@ -15,7 +15,7 @@ struct TimerButton: View {
     var body: some View {
          Button {
              Task {
-                 await beginTimer(length: Double(timerLength))
+                 await beginTimer(length: Double(timerLength), timer: timer)
              }
         } label: {
             Text(timerName)
