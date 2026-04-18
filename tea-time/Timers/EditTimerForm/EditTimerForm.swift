@@ -22,7 +22,7 @@ struct EditTimerForm: View {
     
     private func resetState() {
         newTimerName = ""
-        newTimerLength = "0"
+        newTimerLength = "1"
         selectedTimePeriod = .minutes
         newTextColour = .white
         newTimerBackground = .placeholderBackground
@@ -31,7 +31,7 @@ struct EditTimerForm: View {
         isPresented = false
     }
     
-    private func getSeconds() -> Int64 {
+    private func getSecondsFromInput() -> Int64 {
         let lengthInput = Int64(newTimerLength) ?? 0
         
         if selectedTimePeriod == .seconds {
@@ -76,7 +76,7 @@ struct EditTimerForm: View {
                 timer.bgGreen = bgGreen
                 timer.bgBlue = bgBlue
                 
-                timer.seconds = getSeconds()
+                timer.seconds = getSecondsFromInput()
                 
                 if let folder = folder {
                     timer.folder = folder
@@ -94,7 +94,7 @@ struct EditTimerForm: View {
                 newItem.bgGreen = bgGreen
                 newItem.bgBlue = bgBlue
                 
-                newItem.seconds = getSeconds()
+                newItem.seconds = getSecondsFromInput()
                 
                 if let folder = folder {
                     newItem.folder = folder
@@ -178,10 +178,30 @@ struct EditTimerForm: View {
     init(isPresented: Binding<Bool>) {
         self._isPresented = isPresented
         let timer = appState.timerBeingEdited
+        
+        if let timer = timer {
+            let seconds = timer.seconds
+            if seconds % 3600 == 0 {
+                // Hours
+                _newTimerLength = State(initialValue: "\(seconds / 3600)")
+                _selectedTimePeriod = State(initialValue: .hours)
+            } else if seconds > 0 && seconds % 60 == 0 {
+                // Minutes
+                _newTimerLength = State(initialValue: "\(seconds / 60)")
+                _selectedTimePeriod = State(initialValue: .minutes)
+            } else {
+                // Seconds
+                _newTimerLength = State(initialValue: "\(seconds)")
+                _selectedTimePeriod = State(initialValue: .seconds)
+            }
+        } else {
+            _newTimerLength = State(initialValue: "1")
+            _selectedTimePeriod = State(initialValue: .minutes)
+        }
+        
+        
         _isAdding = State(initialValue: timer == nil)
         _newTimerName = State(initialValue: timer?.timerName ?? "")
-        _newTimerLength = State(initialValue: "\(timer?.seconds ?? 0)")
-        _selectedTimePeriod = State(initialValue: .minutes)
         
         if timer != nil {
             _newTextColour = State(initialValue: Color(red: timer!.textRed, green: timer!.textGreen, blue: timer!.textBlue))
