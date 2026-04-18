@@ -1,14 +1,15 @@
 import SwiftUI
+import CoreData
 
 class AppState: ObservableObject {
-    @Published var folder: String? = nil
+    @Published var folderId: NSManagedObjectID? = nil
     @Published var isEditingFolders: Bool = false
     @Published var folderBeingEdited: Folder? = nil
     @Published var timer: String? = nil
     @Published var timerBeingEdited: Timer? = nil
     
-    func setFolder(_ selectedFolder: String?) {
-        folder = selectedFolder
+    func setFolder(_ selectedFolder: NSManagedObjectID?) {
+        folderId = selectedFolder
     }
     
     func setIsEditingFolders(_ isEditing: Bool) {

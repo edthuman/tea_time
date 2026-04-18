@@ -1,7 +1,7 @@
 import SwiftUI
 import CoreData
 
-func setFolder(_ folder: String?) {
+func setFolder(_ folder: NSManagedObjectID) {
     appState.setFolder(folder)
 }
 

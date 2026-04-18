@@ -99,6 +99,11 @@ struct EditTimerForm: View {
             newItem.bgGreen = Double(bgColor?[1] ?? 0)
             newItem.bgBlue = Double(bgColor?[2] ?? 0)
             
+            if let folderId = state.folderId {
+                let folder = viewContext.object(with: folderId) as? Folder
+                newItem.folder = folder
+            }
+            
             do {
                 try viewContext.save()
                 resetState()
