@@ -2,7 +2,7 @@ import SwiftUI
 import CoreData
 
 struct FolderButton: View {
-    let folder: Folder
+    @ObservedObject var folder: Folder
     let screenWidth = UIScreen.main.bounds.width
     
     var folderId: NSManagedObjectID {

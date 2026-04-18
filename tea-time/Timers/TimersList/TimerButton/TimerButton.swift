@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct TimerButton: View {
-    let timer: Timer
+    @ObservedObject var timer: Timer
     let screenWidth = UIScreen.main.bounds.width
     
     var timerName: String {
