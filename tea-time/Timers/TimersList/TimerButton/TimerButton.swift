@@ -8,9 +8,15 @@ struct TimerButton: View {
         timer.timerName ?? ""
     }
     
+    var timerLength: Int64 {
+        timer.seconds
+    }
+    
     var body: some View {
          Button {
-            setTimer(timerName)
+             Task {
+                 await beginTimer(length: Double(timerLength))
+             }
         } label: {
             Text(timerName)
                 .foregroundStyle(

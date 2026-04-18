@@ -31,6 +31,18 @@ struct EditTimerForm: View {
         isPresented = false
     }
     
+    private func getSeconds() -> Int64 {
+        let lengthInput = Int64(newTimerLength) ?? 0
+        
+        if selectedTimePeriod == .seconds {
+            return lengthInput
+        } else if selectedTimePeriod == .minutes {
+            return lengthInput * 60
+        } else {
+            return lengthInput * 60 * 60
+        }
+    }
+
     private func saveChanges () {
         withAnimation {
             let timer: Timer? = appState.timerBeingEdited
@@ -64,6 +76,8 @@ struct EditTimerForm: View {
                 timer.bgGreen = bgGreen
                 timer.bgBlue = bgBlue
                 
+                timer.seconds = getSeconds()
+                
                 if let folder = folder {
                     timer.folder = folder
                 }
@@ -79,6 +93,8 @@ struct EditTimerForm: View {
                 newItem.bgRed = bgRed
                 newItem.bgGreen = bgGreen
                 newItem.bgBlue = bgBlue
+                
+                newItem.seconds = getSeconds()
                 
                 if let folder = folder {
                     newItem.folder = folder
