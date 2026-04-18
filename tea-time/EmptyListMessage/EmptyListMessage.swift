@@ -1,12 +1,11 @@
 import SwiftUI
 
-struct EmptyFoldersList: View {
-    @ObservedObject var state = appState
-    @State private var isAdding: Bool = false
+struct EmptyListMessage: View {
+    let message: String
     
     var body: some View {
         VStack {
-            Text("No folders")
+            Text("\(message)")
                 .font(.system(size: 20, weight: .medium))
                 .foregroundStyle(.dynamicBlack)
         }

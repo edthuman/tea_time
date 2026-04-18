@@ -28,7 +28,7 @@ struct Folders: View {
             VStack {
                 Group {
                     if (folders.isEmpty) {
-                        EmptyFoldersList()
+                        EmptyListMessage(message: "No folders")
                     } else {
                         ViewThatFits {
                             FoldersList(showEditFolderForm: $showEditFolderForm, showDelete: $showDelete, folders: folders)

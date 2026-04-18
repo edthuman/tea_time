@@ -43,11 +43,15 @@ struct Timers: View {
             
             VStack {
                 Group {
-                    ViewThatFits {
-                        TimersList(showEditTimerForm: $showEditTimerForm, timers: timers)
-                        
-                        ScrollView {
+                    if (timers.isEmpty) {
+                        EmptyListMessage(message: "No timers")
+                    } else {
+                        ViewThatFits {
                             TimersList(showEditTimerForm: $showEditTimerForm, timers: timers)
+                            
+                            ScrollView {
+                                TimersList(showEditTimerForm: $showEditTimerForm, timers: timers)
+                            }
                         }
                     }
                 }
