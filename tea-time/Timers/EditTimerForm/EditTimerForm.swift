@@ -47,6 +47,11 @@ struct EditTimerForm: View {
             let bgGreen = Double(bgColor?[1] ?? 0)
             let bgBlue = Double(bgColor?[2] ?? 0)
             
+            var folder: Folder?
+            if let folderId = state.folderId {
+                folder = viewContext.object(with: folderId) as? Folder
+            }
+            
             if let timer = timer {
                 // Update existing timer
                 timer.timerName = timerName
@@ -58,6 +63,10 @@ struct EditTimerForm: View {
                 timer.bgRed = bgRed
                 timer.bgGreen = bgGreen
                 timer.bgBlue = bgBlue
+                
+                if let folder = folder {
+                    timer.folder = folder
+                }
             } else {
                 // Create new timer
                 let newItem = Timer(context: viewContext)
@@ -70,6 +79,10 @@ struct EditTimerForm: View {
                 newItem.bgRed = bgRed
                 newItem.bgGreen = bgGreen
                 newItem.bgBlue = bgBlue
+                
+                if let folder = folder {
+                    newItem.folder = folder
+                }
             }
             
             do {
@@ -98,11 +111,6 @@ struct EditTimerForm: View {
             newItem.bgRed = Double(bgColor?[0] ?? 0)
             newItem.bgGreen = Double(bgColor?[1] ?? 0)
             newItem.bgBlue = Double(bgColor?[2] ?? 0)
-            
-            if let folderId = state.folderId {
-                let folder = viewContext.object(with: folderId) as? Folder
-                newItem.folder = folder
-            }
             
             do {
                 try viewContext.save()

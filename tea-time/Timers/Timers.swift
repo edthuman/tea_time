@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreData
 
 let reallyMilkyTea = Color(red: 176/255, green: 155/255, blue: 137/255)
 let milkyTea = Color(red: 184/255, green: 145/255, blue:109/255)
@@ -26,14 +27,20 @@ func setTimer(_ timer: String?) {
 }
 
 struct Timers: View {
+    @ObservedObject var state = appState
     @State var showEditTimerForm: Bool = false
+    let folderId: NSManagedObjectID
     
-    @Environment(\.managedObjectContext) private var viewContext
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Timer.timerName, ascending: true)],
-        animation: .default
-    )
-    private var timers: FetchedResults<Timer>
+    @FetchRequest var timers: FetchedResults<Timer>
+    
+    init (folderId: NSManagedObjectID) {
+        self.folderId = folderId
+        self.state = appState
+        _timers = FetchRequest<Timer>(
+            sortDescriptors: [NSSortDescriptor(keyPath: \Timer.timerName, ascending: true)],
+            predicate: NSPredicate(format: "folder == %@", folderId)
+        )
+    }
     
     var body: some View {
         VStack (spacing: 20) {
