@@ -24,6 +24,10 @@ class AppState: ObservableObject {
     func backToHome() {
         setFolder(nil)
         setIsEditingFolders(false)
+        setFolderBeingEdited(nil)
+        setTimer(nil)
+        setIsEditingTimers(false)
+        setTimerBeingEdited(nil)
     }
     
     func setTimer(_ selectedTimer: String?) {

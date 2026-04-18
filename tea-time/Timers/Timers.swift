@@ -40,66 +40,75 @@ struct Timers: View {
     }
     
     var body: some View {
-        if (!timers.isEmpty) {
-            EditTimersButton()
-        }
-        
-        GeometryReader { geometry in
-            let screenHeight = geometry.size.height
+        VStack {
+            HStack {
+                BackButton()
+                
+                if (!timers.isEmpty) {
+                    EditTimersButton()
+                }
+            }
             
-            VStack {
-                Group {
-                    if (timers.isEmpty) {
-                        EmptyListMessage(message: "No timers")
-                    } else {
-                        ViewThatFits {
-                            TimersList(showEditTimerForm: $showEditTimerForm, showDelete: $showDelete, timers: timers)
-                            
-                            ScrollView {
+            GeometryReader { geometry in
+                let screenHeight = geometry.size.height
+                
+                VStack {
+                    Group {
+                        if (timers.isEmpty) {
+                            EmptyListMessage(message: "No timers")
+                        } else {
+                            ViewThatFits {
                                 TimersList(showEditTimerForm: $showEditTimerForm, showDelete: $showDelete, timers: timers)
+                                
+                                ScrollView {
+                                    TimersList(showEditTimerForm: $showEditTimerForm, showDelete: $showDelete, timers: timers)
+                                }
                             }
                         }
                     }
+                    .frame(height: screenHeight * 0.94)
+                    .padding(.bottom, 10)
+                    
+                    AddTimerButton()
                 }
-                .frame(height: screenHeight * 0.94)
-                .padding(.bottom, 10)
+                .frame(maxWidth: .infinity)
+            }
+            .sheet(isPresented: $showEditTimerForm) {
+                EditTimerForm(isPresented: $showEditTimerForm)
+            }
+            .alert(isPresented: $showDelete) {
+                let timer = state.timerBeingEdited
                 
-                AddTimerButton()
-            }
-            .frame(maxWidth: .infinity)
-        }
-        .alert(isPresented: $showDelete) {
-            let timer = state.timerBeingEdited
-            
-            func hideAlert() {
-                showDelete = false
-            }
-            
-            func deleteTimer() {
-                if let timer = timer {
-                    viewContext.delete(timer)
-                    do {
-                        try viewContext.save()
-                    } catch {
-                        // EDTODO - Replace this implementation with code to handle the error appropriately.
-                        // fatalError terminates the app and creates a crash log
-                        let nsError = error as NSError
-                        fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+                func hideAlert() {
+                    showDelete = false
+                }
+                
+                func deleteTimer() {
+                    if let timer = timer {
+                        viewContext.delete(timer)
+                        do {
+                            try viewContext.save()
+                        } catch {
+                            // EDTODO - Replace this implementation with code to handle the error appropriately.
+                            // fatalError terminates the app and creates a crash log
+                            let nsError = error as NSError
+                            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+                        }
                     }
                 }
-            }
-            
-            return Alert(
-                title: Text("You are about to delete \(timer?.timerName ?? "this timer")"),
-                primaryButton: .default(
-                    Text("Cancel"),
-                    action: hideAlert
-                ),
-                secondaryButton: .destructive(
-                    Text("Delete"),
-                    action: deleteTimer
+                
+                return Alert(
+                    title: Text("You are about to delete \(timer?.timerName ?? "this timer")"),
+                    primaryButton: .default(
+                        Text("Cancel"),
+                        action: hideAlert
+                    ),
+                    secondaryButton: .destructive(
+                        Text("Delete"),
+                        action: deleteTimer
+                    )
                 )
-            )
+            }
         }
     }
 }
