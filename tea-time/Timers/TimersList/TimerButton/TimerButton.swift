@@ -22,7 +22,7 @@ struct TimerButton: View {
                 .foregroundStyle(
                     Color(red: timer.textRed, green: timer.textGreen, blue: timer.textBlue))
                 .fontWeight(.bold)
-                .frame(maxWidth: screenWidth * 0.3)
+                .frame(maxWidth: screenWidth * 0.36)
                 .padding(20)
         }
         .background(
