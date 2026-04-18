@@ -266,9 +266,12 @@ struct EditTimerForm: View {
                     }
                     
                     Picker("", selection: $selectedTimePeriod) {
-                        Text("seconds").tag(TimePeriods.seconds)
-                        Text("minutes").tag(TimePeriods.minutes)
-                        Text("hours").tag(TimePeriods.hours)
+                        Text(newTimerLength == "1" ? "second" : "seconds")
+                            .tag(TimePeriods.seconds)
+                        Text(newTimerLength == "1" ? "minute" : "minutes")
+                            .tag(TimePeriods.minutes)
+                        Text(newTimerLength == "1" ? "hour" : "hours")
+                            .tag(TimePeriods.hours)
                     }
                 }
                 
