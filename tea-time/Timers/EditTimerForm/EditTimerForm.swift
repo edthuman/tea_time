@@ -171,7 +171,6 @@ struct EditTimerForm: View {
         if isTooLow {
             return "0"
         }
-        // Convert to Int first to remove leading zeros
         return String(zeroesRemoved)
     }
     
