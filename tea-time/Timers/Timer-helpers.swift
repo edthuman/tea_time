@@ -55,13 +55,13 @@ func createNotification(title: String, description: String, playSound: Bool, tim
     content.body = description
     
     if (playSound && timer.folder?.folderName == "Mary") {
-            // add default sound to notification config
-            let soundName = UNNotificationSoundName(rawValue: "_mary.wav")
-            content.sound = UNNotificationSound(named: soundName)
-        } else if (playSound) {
-            let soundName = UNNotificationSoundName(rawValue: "_ed.wav")
-            content.sound = UNNotificationSound(named: soundName)
-        }
+        // add default sound to notification config
+        let soundName = UNNotificationSoundName(rawValue: "_mary.wav")
+        content.sound = UNNotificationSound(named: soundName)
+    } else if (playSound) {
+        let soundName = UNNotificationSoundName(rawValue: "_ed.wav")
+        content.sound = UNNotificationSound(named: soundName)
+    }
     
     if (timeDelay != nil) {
         // send notification to be sent after timer length passes
