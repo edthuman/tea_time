@@ -198,7 +198,6 @@ struct EditTimerForm: View {
             _selectedTimePeriod = State(initialValue: .minutes)
         }
         
-        
         _isAdding = State(initialValue: timer == nil)
         _newTimerName = State(initialValue: timer?.timerName ?? "")
         
