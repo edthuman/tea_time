@@ -5,13 +5,10 @@ struct AppContent: View {
     @ObservedObject var state = appState
     
     var body: some View {
-        if (state.folder.count == 0) {
-            Folders()
+        if let folderId = state.folderId {
+            Timers(folderId: folderId)
         } else {
-            VStack {
-                BackButton()
-                MadeTeaButtons()
-            }
+            Folders()
         }
     }
 }

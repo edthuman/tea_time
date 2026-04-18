@@ -1,12 +1,8 @@
 import SwiftUI
 import CoreData
 
-func setPage(page: String) {
-    appState.setPage(selectedPage: page)
-}
-
-func setFolder(folder: String) {
-    appState.setFolder(selectedFolder: folder)
+func setFolder(_ folder: NSManagedObjectID) {
+    appState.setFolder(folder)
 }
 
 struct Folders: View {
@@ -32,7 +28,7 @@ struct Folders: View {
             VStack {
                 Group {
                     if (folders.isEmpty) {
-                        EmptyFoldersList()
+                        EmptyListMessage(message: "No folders")
                     } else {
                         ViewThatFits {
                             FoldersList(showEditFolderForm: $showEditFolderForm, showDelete: $showDelete, folders: folders)

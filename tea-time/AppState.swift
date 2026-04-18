@@ -1,17 +1,16 @@
 import SwiftUI
+import CoreData
 
 class AppState: ObservableObject {
-    @Published var page: String = ""
-    @Published var folder: String = ""
+    @Published var folderId: NSManagedObjectID? = nil
     @Published var isEditingFolders: Bool = false
     @Published var folderBeingEdited: Folder? = nil
-
-    func setPage(selectedPage: String) {
-        page = selectedPage
-    }
+    @Published var timer: String? = nil
+    @Published var isEditingTimers: Bool = false
+    @Published var timerBeingEdited: Timer? = nil
     
-    func setFolder(selectedFolder: String) {
-        folder = selectedFolder
+    func setFolder(_ selectedFolder: NSManagedObjectID?) {
+        folderId = selectedFolder
     }
     
     func setIsEditingFolders(_ isEditing: Bool) {
@@ -20,6 +19,27 @@ class AppState: ObservableObject {
     
     func setFolderBeingEdited(_ folder: Folder?) {
         folderBeingEdited = folder
+    }
+    
+    func backToHome() {
+        setFolder(nil)
+        setIsEditingFolders(false)
+        setFolderBeingEdited(nil)
+        setTimer(nil)
+        setIsEditingTimers(false)
+        setTimerBeingEdited(nil)
+    }
+    
+    func setTimer(_ selectedTimer: String?) {
+        timer = selectedTimer
+    }
+    
+    func setIsEditingTimers(_ isEditing: Bool) {
+        isEditingTimers = isEditing
+    }
+    
+    func setTimerBeingEdited(_ timer: Timer?) {
+        timerBeingEdited = timer
     }
 }
 

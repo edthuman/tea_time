@@ -1,8 +1,13 @@
 import SwiftUI
+import CoreData
 
 struct FolderButton: View {
-    let folder: Folder
+    @ObservedObject var folder: Folder
     let screenWidth = UIScreen.main.bounds.width
+    
+    var folderId: NSManagedObjectID {
+        folder.objectID
+    }
     
     var folderName: String {
         folder.folderName ?? ""
@@ -10,7 +15,7 @@ struct FolderButton: View {
     
     var body: some View {
          Button {
-            setFolder(folder: folderName)
+            setFolder(folderId)
         } label: {
             Text(folderName)
                 .foregroundStyle(
