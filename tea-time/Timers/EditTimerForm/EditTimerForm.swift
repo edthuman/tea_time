@@ -1,6 +1,12 @@
 import SwiftUI
 import CoreData
 
+enum TimePeriods {
+    case seconds;
+    case minutes;
+    case hours;
+}
+
 struct EditTimerForm: View {
     @ObservedObject var state = appState
     @Environment(\.managedObjectContext) private var viewContext
@@ -9,11 +15,15 @@ struct EditTimerForm: View {
     
     @State private var isAdding: Bool
     @State private var newTimerName: String
+    @State private var newTimerLength: String
+    @State private var selectedTimePeriod: TimePeriods
     @State private var newTextColour: Color
     @State private var newTimerBackground: Color
     
     private func resetState() {
         newTimerName = ""
+        newTimerLength = "0"
+        selectedTimePeriod = .minutes
         newTextColour = .white
         newTimerBackground = .placeholderBackground
         isAdding.toggle()
@@ -101,11 +111,48 @@ struct EditTimerForm: View {
         }
     }
     
+    private func incrementTimeLength() {
+        let currentValue = Int(newTimerLength) ?? 0
+        newTimerLength = "\(currentValue + 1)"
+    }
+    
+    private func decrementTimeLength() {
+        let currentValue = Int(newTimerLength) ?? 0
+        
+        if currentValue > 0 {
+            newTimerLength = "\(currentValue - 1)"
+        }
+    }
+    
+    private func getNewTimerLength(_ timerLength: String) -> String {
+        let filtered = timerLength.filter { "0123456789".contains($0) }
+        if filtered.isEmpty {
+            return "0"
+        }
+        
+        // Removed leading zeroes
+        let zeroesRemoved = Int(filtered) ?? 0
+
+        let isTooHigh = zeroesRemoved > 1_000_000
+        if isTooHigh {
+            return "1000000"
+        }
+        
+        let isTooLow = zeroesRemoved < 0
+        if isTooLow {
+            return "0"
+        }
+        // Convert to Int first to remove leading zeros
+        return String(zeroesRemoved)
+    }
+    
     init(isPresented: Binding<Bool>) {
         self._isPresented = isPresented
         let timer = appState.timerBeingEdited
         _isAdding = State(initialValue: timer == nil)
         _newTimerName = State(initialValue: timer?.timerName ?? "")
+        _newTimerLength = State(initialValue: "\(timer?.seconds ?? 0)")
+        _selectedTimePeriod = State(initialValue: .minutes)
         
         if timer != nil {
             _newTextColour = State(initialValue: Color(red: timer!.textRed, green: timer!.textGreen, blue: timer!.textBlue))
@@ -142,6 +189,39 @@ struct EditTimerForm: View {
                         newTimerBackground,
                         in: RoundedRectangle(cornerRadius: 12)
                     )
+                    .padding(.bottom, 10)
+                
+                
+                HStack (spacing: 20) {
+                    Button {
+                        decrementTimeLength()
+                    } label: {
+                        Text("-")
+                    }
+                    
+                    TextField("0", text: $newTimerLength)
+                        .onChange(of: newTimerLength) { oldValue, input in
+                            newTimerLength = getNewTimerLength(input)
+                        }
+                      .multilineTextAlignment(.center)
+                      .keyboardType(.numberPad)
+                      .padding(.leading, 1)
+                      .padding(.trailing, 1)
+                      .frame(minWidth: 30, idealWidth: nil, maxWidth: nil)
+                      .fixedSize()
+                    
+                    Button {
+                        incrementTimeLength()
+                    } label: {
+                        Text("+")
+                    }
+                    
+                    Picker("", selection: $selectedTimePeriod) {
+                        Text("seconds").tag(TimePeriods.seconds)
+                        Text("minutes").tag(TimePeriods.minutes)
+                        Text("hours").tag(TimePeriods.hours)
+                    }
+                }
                 
                 ColorPicker("Text Colour", selection: $newTextColour)
                     .frame(width: screenWidth * 0.45)
