@@ -1,19 +1,19 @@
 import SwiftUI
 
-struct EditFoldersButton: View {
+struct EditTimersButton: View {
     @ObservedObject var state = appState
-    
-    private func toggleIsEditingFolders() {
-        let isEditingFolders = !appState.isEditingFolders
-        appState.setIsEditingFolders(isEditingFolders)
+ 
+    private func toggleIsEditingTimers() {
+        let isEditingTimers = !appState.isEditingTimers
+        appState.setIsEditingTimers(isEditingTimers)
     }
     
     var body: some View {
         ZStack (alignment: .trailing){
             Button {
-                toggleIsEditingFolders()
+                toggleIsEditingTimers()
             } label: {
-                if (state.isEditingFolders) {
+                if (state.isEditingTimers) {
                     Image(systemName: "arrow.uturn.backward")
                         .foregroundStyle(.blue)
                 } else {
