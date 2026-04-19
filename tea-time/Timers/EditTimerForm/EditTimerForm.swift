@@ -19,6 +19,8 @@ struct EditTimerForm: View {
     @State private var selectedTimePeriod: TimePeriods
     @State private var newTextColour: Color
     @State private var newTimerBackground: Color
+    @State private var showPicker = false
+    @State private var audioURL: URL? = nil
     
     private func resetState() {
         newTimerName = ""
@@ -238,6 +240,14 @@ struct EditTimerForm: View {
                     )
                     .padding(.bottom, 10)
                 
+                ColorPicker("Text Colour", selection: $newTextColour)
+                    .frame(width: screenWidth * 0.45)
+                    .padding(.top, 5)
+                    .padding(.vertical, 10)
+                
+                ColorPicker("Background Colour", selection: $newTimerBackground)
+                    .frame(width: screenWidth * 0.45)
+                    .padding(.top, 10)
                 
                 HStack (spacing: 20) {
                     Button {
@@ -272,15 +282,21 @@ struct EditTimerForm: View {
                             .tag(TimePeriods.hours)
                     }
                 }
+                .padding(.vertical, 20)
                 
-                ColorPicker("Text Colour", selection: $newTextColour)
-                    .frame(width: screenWidth * 0.45)
-                    .padding(.top, 5)
-                    .padding(.vertical, 10)
+                if let audioURL = audioURL {
+                    HStack (spacing: 10) {
+                        Text("Preview audio")
+                        AudioPlayer(audioURL: audioURL)
+                    }.padding(.bottom, 10)
+                }
                 
-                ColorPicker("Background Colour", selection: $newTimerBackground)
-                    .frame(width: screenWidth * 0.45)
-                    .padding(.vertical, 10)
+                Button(audioURL != nil ? "Change Audio" : "Select Audio") {
+                    showPicker = true
+                }
+                .sheet(isPresented: $showPicker) {
+                    AudioPicker(audioURL: $audioURL)
+                }.padding(.bottom, 20)
                 
                 HStack {
                     Button(action: resetState) {
