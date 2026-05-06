@@ -5,13 +5,18 @@ class AudioPlayerManager: NSObject, ObservableObject {
     var audioPlayer: AVAudioPlayer?
 
     func playAudio(from url: URL) {
+        let canAccess = url.startAccessingSecurityScopedResource()
+        defer {
+            if canAccess {
+                url.stopAccessingSecurityScopedResource()
+            }
+        }
+
         do {
             audioPlayer = try AVAudioPlayer(contentsOf: url)
-            // Buffer the file
             audioPlayer?.prepareToPlay()
             audioPlayer?.play()
         } catch {
-            // EDTODO - improve error handling
             print("Playback failed: \(error.localizedDescription)")
         }
     }
@@ -25,11 +30,43 @@ struct AudioPlayer: View {
     @StateObject var player = AudioPlayerManager()
     @State var isPlaying: Bool = false
     
-    var audioURL: URL?
+    var audioBookmark: Data?
+    
 
+    private func getURLFromBookmark() -> URL? {
+        guard let data = audioBookmark else { return nil }
+        
+        var isStale = false
+        do {
+            let url = try URL(resolvingBookmarkData: data,
+                              options: [],
+                              relativeTo: nil,
+                              bookmarkDataIsStale: &isStale)
+            
+            if isStale {
+                // EDTODO - add handling for stale bookmark
+            }
+            
+            return url
+        } catch {
+            print("Could not resolve bookmark: \(error)")
+            return nil
+        }
+    }
+    
     var body: some View {
         Button {
-            guard let url = audioURL else { return }
+            if audioBookmark == nil {
+                return;
+            }
+            var url: URL?
+            if let urlFromBookmark = getURLFromBookmark() {
+                url = urlFromBookmark;
+            } else {
+                return;
+            }
+            
+            guard let url = url else { return }
             if isPlaying {
                 isPlaying.toggle()
                 player.stopAudio()
@@ -41,6 +78,6 @@ struct AudioPlayer: View {
         } label: {
             Image(systemName: isPlaying ? "stop.fill" : "play.fill")
         }
-        .disabled(audioURL == nil)
+        .disabled(audioBookmark == nil)
     }
 }

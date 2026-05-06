@@ -20,7 +20,7 @@ struct EditTimerForm: View {
     @State private var newTextColour: Color
     @State private var newTimerBackground: Color
     @State private var showPicker = false
-    @State private var audioURL: URL? = nil
+    @State private var newAudioBookmark: Data? = nil
     
     private func resetState() {
         newTimerName = ""
@@ -31,6 +31,7 @@ struct EditTimerForm: View {
         isAdding.toggle()
         appState.setTimerBeingEdited(nil)
         isPresented = false
+        newAudioBookmark = nil
     }
     
     private func getSecondsFromInput() -> Int64 {
@@ -83,6 +84,12 @@ struct EditTimerForm: View {
                 if let folder = folder {
                     timer.folder = folder
                 }
+                
+                if let audioBookmark = newAudioBookmark {
+                    // EDTODO - Retrieve audio using bookmark access
+                    printWithNewlineAbove(input: audioBookmark)
+                    
+                }
             } else {
                 // Create new timer
                 let newItem = Timer(context: viewContext)
@@ -100,6 +107,11 @@ struct EditTimerForm: View {
                 
                 if let folder = folder {
                     newItem.folder = folder
+                }
+                
+                if let audioBookmark = newAudioBookmark {
+                    // EDTODO - Retrieve audio using bookmark access
+                    printWithNewlineAbove(input: audioBookmark)
                 }
             }
             
@@ -203,9 +215,11 @@ struct EditTimerForm: View {
         _isAdding = State(initialValue: timer == nil)
         _newTimerName = State(initialValue: timer?.timerName ?? "")
         
-        if timer != nil {
-            _newTextColour = State(initialValue: Color(red: timer!.textRed, green: timer!.textGreen, blue: timer!.textBlue))
-            _newTimerBackground = State(initialValue: Color(red: timer!.bgRed, green: timer!.bgGreen, blue: timer!.bgBlue))
+        if let timer = timer {
+            _newTextColour = State(initialValue: Color(red: timer.textRed, green: timer.textGreen, blue: timer.textBlue))
+            _newTimerBackground = State(initialValue: Color(red: timer.bgRed, green: timer.bgGreen, blue: timer.bgBlue))
+            
+            _newAudioBookmark = State(initialValue: timer.bookmarkData)
         } else {
             _newTextColour = State(initialValue: .white)
             _newTimerBackground = State(initialValue: .placeholderBackground)
@@ -284,18 +298,18 @@ struct EditTimerForm: View {
                 }
                 .padding(.vertical, 20)
                 
-                if let audioURL = audioURL {
+                if let audioBookmark = newAudioBookmark {
                     HStack (spacing: 10) {
                         Text("Preview audio")
-                        AudioPlayer(audioURL: audioURL)
+                        AudioPlayer(audioBookmark: audioBookmark)
                     }.padding(.bottom, 10)
                 }
                 
-                Button(audioURL != nil ? "Change Audio" : "Select Audio") {
+                Button(newAudioBookmark != nil ? "Change Audio" : "Select Audio") {
                     showPicker = true
                 }
                 .sheet(isPresented: $showPicker) {
-                    AudioPicker(audioURL: $audioURL)
+                    AudioPicker(audioBookmark: $newAudioBookmark)
                 }.padding(.bottom, 20)
                 
                 HStack {

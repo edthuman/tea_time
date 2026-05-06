@@ -3,10 +3,10 @@ import UIKit
 import UniformTypeIdentifiers
 
 struct AudioPicker: UIViewControllerRepresentable {
-    @Binding var audioURL: URL?
+    @Binding var audioBookmark: Data?
     
     func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
-        let picker = UIDocumentPickerViewController(forOpeningContentTypes: [.audio], asCopy: true)
+        let picker = UIDocumentPickerViewController(forOpeningContentTypes: [.audio], asCopy: false)
         picker.delegate = context.coordinator
         return picker
     }
@@ -25,8 +25,21 @@ struct AudioPicker: UIViewControllerRepresentable {
         }
         
         func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
-            if let url = urls.first {
-                parent.audioURL = url
+            guard let url = urls.first else { return }
+
+            guard url.startAccessingSecurityScopedResource() else { return }
+            defer { url.stopAccessingSecurityScopedResource() }
+
+            do {
+                // Create a bookmark for accessing audio files without making copies
+                let bookmarkData: Data = try url.bookmarkData(
+                    options: .minimalBookmark,
+                    includingResourceValuesForKeys: nil,
+                    relativeTo: nil)
+
+                parent.audioBookmark = bookmarkData
+            } catch {
+                print("Failed to create bookmark: \(error)")
             }
         }
     }
