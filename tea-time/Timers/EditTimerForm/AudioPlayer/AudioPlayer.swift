@@ -6,49 +6,56 @@ class AudioPlayerManager: NSObject, ObservableObject, AVAudioPlayerDelegate {
     var audioPlayer: AVAudioPlayer?
     private var currentPlayingURL: URL?
     
+    override init() {
+        super.init()
+        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+    }
+    
     func playAudio(from url: URL) {
         if currentPlayingURL != nil {
-            cleanUpAudioResources();
+            cleanUpAudioResources()
         }
         
-        let canAccess = url.startAccessingSecurityScopedResource();
+        try? AVAudioSession.sharedInstance().setActive(true)
+        
+        let canAccess = url.startAccessingSecurityScopedResource()
         if canAccess {
-            currentPlayingURL = url;
+            currentPlayingURL = url
         }
 
         do {
-            isPlaying = true;
-            audioPlayer = try AVAudioPlayer(contentsOf: url);
+            isPlaying = true
+            audioPlayer = try AVAudioPlayer(contentsOf: url)
             audioPlayer?.delegate = self
-            audioPlayer?.prepareToPlay();
-            audioPlayer?.play();
+            audioPlayer?.prepareToPlay()
+            audioPlayer?.play()
         } catch {
-            print("Playback failed: \(error.localizedDescription)");
+            print("Playback failed: \(error.localizedDescription)")
         }
     }
     
     func stopAudio() {
-        audioPlayer?.stop();
-        isPlaying = false;
-        cleanUpAudioResources();
+        audioPlayer?.stop()
+        isPlaying = false
+        cleanUpAudioResources()
     }
     
     internal func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        stopAudio();
+        stopAudio()
     }
     
     private func cleanUpAudioResources() {
-        audioPlayer?.stop();
-        audioPlayer = nil;
+        audioPlayer?.stop()
+        audioPlayer = nil
         
         if let url = currentPlayingURL {
-            url.stopAccessingSecurityScopedResource();
+            url.stopAccessingSecurityScopedResource()
             currentPlayingURL = nil
         }
     }
     
     deinit {
-        cleanUpAudioResources();
+        cleanUpAudioResources()
     }
 }
 
@@ -81,13 +88,13 @@ struct AudioPlayer: View {
     var body: some View {
         Button {
             if audioBookmark == nil {
-                return;
+                return
             }
             var url: URL?
             if let urlFromBookmark = getURLFromBookmark() {
-                url = urlFromBookmark;
+                url = urlFromBookmark
             } else {
-                return;
+                return
             }
             
             guard let url = url else { return }
