@@ -1,37 +1,57 @@
 import AVFoundation
 import SwiftUI
 
-class AudioPlayerManager: NSObject, ObservableObject {
+class AudioPlayerManager: NSObject, ObservableObject, AVAudioPlayerDelegate {
+    @Published var isPlaying: Bool = false
     var audioPlayer: AVAudioPlayer?
-
+    private var currentPlayingURL: URL?
+    
     func playAudio(from url: URL) {
-        let canAccess = url.startAccessingSecurityScopedResource()
-        defer {
-            if canAccess {
-                url.stopAccessingSecurityScopedResource()
-            }
+        let canAccess = url.startAccessingSecurityScopedResource();
+        if canAccess {
+            currentPlayingURL = url;
         }
 
         do {
-            audioPlayer = try AVAudioPlayer(contentsOf: url)
-            audioPlayer?.prepareToPlay()
-            audioPlayer?.play()
+            isPlaying = true;
+            audioPlayer = try AVAudioPlayer(contentsOf: url);
+            audioPlayer?.delegate = self
+            audioPlayer?.prepareToPlay();
+            audioPlayer?.play();
         } catch {
-            print("Playback failed: \(error.localizedDescription)")
+            print("Playback failed: \(error.localizedDescription)");
         }
     }
     
     func stopAudio() {
-        audioPlayer?.stop()
+        audioPlayer?.stop();
+        isPlaying = false;
+        cleanUpAudioResources();
+    }
+    
+    internal func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        stopAudio();
+    }
+    
+    private func cleanUpAudioResources() {
+        audioPlayer?.stop();
+        audioPlayer = nil;
+        
+        if let url = currentPlayingURL {
+            url.stopAccessingSecurityScopedResource();
+            currentPlayingURL = nil
+        }
+    }
+    
+    deinit {
+        cleanUpAudioResources();
     }
 }
 
 struct AudioPlayer: View {
     @StateObject var player = AudioPlayerManager()
-    @State var isPlaying: Bool = false
     
     var audioBookmark: Data?
-    
 
     private func getURLFromBookmark() -> URL? {
         guard let data = audioBookmark else { return nil }
@@ -67,16 +87,14 @@ struct AudioPlayer: View {
             }
             
             guard let url = url else { return }
-            if isPlaying {
-                isPlaying.toggle()
+            if player.isPlaying {
                 player.stopAudio()
             } else {
-                isPlaying.toggle()
                 player.playAudio(from: url)
             }
             
         } label: {
-            Image(systemName: isPlaying ? "stop.fill" : "play.fill")
+            Image(systemName: player.isPlaying ? "stop.fill" : "play.fill")
         }
         .disabled(audioBookmark == nil)
     }
