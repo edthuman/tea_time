@@ -35,7 +35,6 @@ class AudioPlayerManager: NSObject, ObservableObject, AVAudioPlayerDelegate {
     }
     
     func stopAudio() {
-        audioPlayer?.stop()
         isPlaying = false
         cleanUpAudioResources()
     }
