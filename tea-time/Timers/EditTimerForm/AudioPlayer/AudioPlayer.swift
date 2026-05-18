@@ -7,6 +7,10 @@ class AudioPlayerManager: NSObject, ObservableObject, AVAudioPlayerDelegate {
     private var currentPlayingURL: URL?
     
     func playAudio(from url: URL) {
+        if currentPlayingURL != nil {
+            cleanUpAudioResources();
+        }
+        
         let canAccess = url.startAccessingSecurityScopedResource();
         if canAccess {
             currentPlayingURL = url;
