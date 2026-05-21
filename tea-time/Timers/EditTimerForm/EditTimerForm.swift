@@ -51,6 +51,7 @@ struct EditTimerForm: View {
             let timer: Timer? = appState.timerBeingEdited
   
             let timerName = newTimerName
+            let bookmarkData = newAudioBookmark
             
             let textColor = UIColor(newTextColour).cgColor.components
             let textRed = Double(textColor?[0] ?? 0)
@@ -70,6 +71,8 @@ struct EditTimerForm: View {
             if let timer = timer {
                 // Update existing timer
                 timer.timerName = timerName
+                timer.seconds = getSecondsFromInput()
+                timer.bookmarkData = bookmarkData
 
                 timer.textRed = textRed
                 timer.textGreen = textGreen
@@ -78,22 +81,13 @@ struct EditTimerForm: View {
                 timer.bgRed = bgRed
                 timer.bgGreen = bgGreen
                 timer.bgBlue = bgBlue
-                
-                timer.seconds = getSecondsFromInput()
-                
-                if let folder = folder {
-                    timer.folder = folder
-                }
-                
-                if let audioBookmark = newAudioBookmark {
-                    // EDTODO - Retrieve audio using bookmark access
-                    printWithNewlineAbove(input: audioBookmark)
-                    
-                }
             } else {
                 // Create new timer
                 let newItem = Timer(context: viewContext)
                 newItem.timerName = timerName
+                newItem.folder = folder
+                newItem.seconds = getSecondsFromInput()
+                newItem.bookmarkData = bookmarkData
                 
                 newItem.textRed = textRed
                 newItem.textGreen = textGreen
@@ -102,17 +96,6 @@ struct EditTimerForm: View {
                 newItem.bgRed = bgRed
                 newItem.bgGreen = bgGreen
                 newItem.bgBlue = bgBlue
-                
-                newItem.seconds = getSecondsFromInput()
-                
-                if let folder = folder {
-                    newItem.folder = folder
-                }
-                
-                if let audioBookmark = newAudioBookmark {
-                    // EDTODO - Retrieve audio using bookmark access
-                    printWithNewlineAbove(input: audioBookmark)
-                }
             }
             
             do {
