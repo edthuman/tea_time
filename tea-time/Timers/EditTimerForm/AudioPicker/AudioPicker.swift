@@ -1,9 +1,11 @@
 import SwiftUI
+import AVFoundation
 import UIKit
 import UniformTypeIdentifiers
 
 struct AudioPicker: UIViewControllerRepresentable {
     @Binding var audioBookmark: Data?
+    @Binding var audioTooLong: Bool
     
     func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
         let picker = UIDocumentPickerViewController(forOpeningContentTypes: [.audio], asCopy: false)
@@ -30,16 +32,38 @@ struct AudioPicker: UIViewControllerRepresentable {
             guard url.startAccessingSecurityScopedResource() else { return }
             defer { url.stopAccessingSecurityScopedResource() }
 
-            do {
-                // Create a bookmark for accessing audio files without making copies
-                let bookmarkData: Data = try url.bookmarkData(
-                    options: .minimalBookmark,
-                    includingResourceValuesForKeys: nil,
-                    relativeTo: nil)
+            Task {
+                if (await checkAudioLengthValid(url: url)) == false {
+                    parent.audioTooLong = true
+                    return
+                }
 
-                parent.audioBookmark = bookmarkData
+                do {
+                    let bookmarkData: Data = try url.bookmarkData(
+                        options: .minimalBookmark,
+                        includingResourceValuesForKeys: nil,
+                        relativeTo: nil)
+
+                    parent.audioBookmark = bookmarkData
+                } catch {
+                    print("Failed to create bookmark: \(error)")
+                }
+            }
+        }
+        
+        private func checkAudioLengthValid (url: URL) async -> Bool {
+            let audioFileDetails = AVURLAsset(url: url)
+
+            do {
+                let durationDetails = try await audioFileDetails.load(.duration)
+                let duration = CMTimeGetSeconds(durationDetails)
+                if duration >= 30.0 {
+                    // 30 seconds limit comes from UNNotificationSound
+                    return false
+                }
+                return true
             } catch {
-                print("Failed to create bookmark: \(error)")
+                return false
             }
         }
     }
