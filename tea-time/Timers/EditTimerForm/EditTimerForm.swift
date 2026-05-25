@@ -7,6 +7,8 @@ enum TimePeriods {
     case hours;
 }
 
+let fileManager = FileManager()
+
 struct EditTimerForm: View {
     @ObservedObject var state = appState
     @Environment(\.managedObjectContext) private var viewContext
@@ -49,58 +51,50 @@ struct EditTimerForm: View {
 
     private func saveChanges () {
         withAnimation {
-            let timer: Timer? = appState.timerBeingEdited
-  
-            let timerName = newTimerName
-            let bookmarkData = newAudioBookmark
+            var timer: Timer? = appState.timerBeingEdited
+
+            if timer == nil {
+                let newItem = Timer(context: viewContext)
+                
+                var folder: Folder?
+                if let folderId = state.folderId {
+                    folder = viewContext.object(with: folderId) as? Folder
+                }
+                newItem.folder = folder
+                timer = newItem
+            }
+            guard let timer = timer else {
+                return
+            }
             
+            timer.timerName = newTimerName
+            timer.seconds = getSecondsFromInput()
+
+            // Text colour
             let textColor = UIColor(newTextColour).cgColor.components
             let textRed = Double(textColor?[0] ?? 0)
             let textGreen = Double(textColor?[1] ?? 0)
             let textBlue = Double(textColor?[2] ?? 0)
+            timer.textRed = textRed
+            timer.textGreen = textGreen
+            timer.textBlue = textBlue
             
+            // Background colour
             let bgColor = UIColor(newTimerBackground).cgColor.components
             let bgRed = Double(bgColor?[0] ?? 0)
             let bgGreen = Double(bgColor?[1] ?? 0)
             let bgBlue = Double(bgColor?[2] ?? 0)
             
-            var folder: Folder?
-            if let folderId = state.folderId {
-                folder = viewContext.object(with: folderId) as? Folder
-            }
-            
-            if let timer = timer {
-                // Update existing timer
-                timer.timerName = timerName
-                timer.seconds = getSecondsFromInput()
-                timer.bookmarkData = bookmarkData
-
-                timer.textRed = textRed
-                timer.textGreen = textGreen
-                timer.textBlue = textBlue
-                
-                timer.bgRed = bgRed
-                timer.bgGreen = bgGreen
-                timer.bgBlue = bgBlue
-            } else {
-                // Create new timer
-                let newItem = Timer(context: viewContext)
-                newItem.timerName = timerName
-                newItem.folder = folder
-                newItem.seconds = getSecondsFromInput()
-                newItem.bookmarkData = bookmarkData
-                
-                newItem.textRed = textRed
-                newItem.textGreen = textGreen
-                newItem.textBlue = textBlue
-                
-                newItem.bgRed = bgRed
-                newItem.bgGreen = bgGreen
-                newItem.bgBlue = bgBlue
-            }
+            timer.bgRed = bgRed
+            timer.bgGreen = bgGreen
+            timer.bgBlue = bgBlue
             
             do {
                 try viewContext.save()
+
+                let fileName = timer.objectID.uriRepresentation().lastPathComponent
+                saveNotificationSound(fileBookmark: newAudioBookmark, fileName: fileName)
+
                 resetState()
             } catch {
                 // EDTODO - Replace this implementation with code to handle the error appropriately.
@@ -108,6 +102,53 @@ struct EditTimerForm: View {
                 let nsError = error as NSError
                 fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
             }
+        }
+    }
+    
+    private func saveNotificationSound(fileBookmark: Data?, fileName: String) {
+        if fileBookmark == nil {
+            // No sound to save
+            return
+        }
+        
+        do {
+            let soundsDirectoryURL = fileManager.urls(
+                for: .libraryDirectory,
+                in: .userDomainMask
+            )
+            .first!
+            .appendingPathComponent("Sounds")
+            
+            try fileManager.createDirectory(
+                at: soundsDirectoryURL,
+                withIntermediateDirectories: true,
+                attributes: nil
+            )
+            
+            let soundFileURL = soundsDirectoryURL
+                .appendingPathComponent(fileName)
+            var isStale: Bool = false
+            let bookmarkURL = try URL(resolvingBookmarkData: fileBookmark!, bookmarkDataIsStale: &isStale)
+            
+            if (bookmarkURL.startAccessingSecurityScopedResource()) {
+                defer {
+                    bookmarkURL.stopAccessingSecurityScopedResource()
+                }
+                
+                // Delete existing file if it already exists
+                if fileManager.fileExists(atPath: soundFileURL.path()) {
+                    try fileManager.removeItem(at: soundFileURL)
+                }
+                
+                // Copy selected file into
+                try FileManager.default.copyItem(
+                    at: bookmarkURL,
+                    to: soundFileURL,
+                )
+            }
+        }
+        catch {
+            printWithNewlineAbove(input: "Failed to create audio file:\n \(error)\n")
         }
     }
     
@@ -202,8 +243,6 @@ struct EditTimerForm: View {
         if let timer = timer {
             _newTextColour = State(initialValue: Color(red: timer.textRed, green: timer.textGreen, blue: timer.textBlue))
             _newTimerBackground = State(initialValue: Color(red: timer.bgRed, green: timer.bgGreen, blue: timer.bgBlue))
-            
-            _newAudioBookmark = State(initialValue: timer.bookmarkData)
         } else {
             _newTextColour = State(initialValue: .white)
             _newTimerBackground = State(initialValue: .placeholderBackground)
