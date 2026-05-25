@@ -105,28 +105,42 @@ struct EditTimerForm: View {
         }
     }
     
-    private func saveNotificationSound(fileBookmark: Data?, fileName: String) {
-        if fileBookmark == nil {
-            // No sound to save
-            return
-        }
+    private func getSoundsDirectoryURL() throws -> URL {
+        let soundsDirectoryURL = fileManager.urls(
+            for: .libraryDirectory,
+            in: .userDomainMask
+        )
+        .first!
+        .appendingPathComponent("Sounds")
         
+        try fileManager.createDirectory(
+            at: soundsDirectoryURL,
+            withIntermediateDirectories: true,
+            attributes: nil
+        )
+        return soundsDirectoryURL
+    }
+    
+    private func getSoundFileURL(fileName: String) throws -> URL {
+        let soundsDirectoryURL = try getSoundsDirectoryURL()
+
+        let soundFileURL = soundsDirectoryURL
+            .appendingPathComponent(fileName)
+        return soundFileURL
+    }
+    
+    private func saveNotificationSound(fileBookmark: Data?, fileName: String) {
         do {
-            let soundsDirectoryURL = fileManager.urls(
-                for: .libraryDirectory,
-                in: .userDomainMask
-            )
-            .first!
-            .appendingPathComponent("Sounds")
+            let soundFileURL: URL = try getSoundFileURL(fileName: fileName)
+                
+            if fileBookmark == nil {
+                if fileManager.fileExists(atPath: soundFileURL.path()) {
+                    // Deleting existing notification sound if removed
+                    try fileManager.removeItem(at: soundFileURL)
+                }
+                return
+            }
             
-            try fileManager.createDirectory(
-                at: soundsDirectoryURL,
-                withIntermediateDirectories: true,
-                attributes: nil
-            )
-            
-            let soundFileURL = soundsDirectoryURL
-                .appendingPathComponent(fileName)
             var isStale: Bool = false
             let bookmarkURL = try URL(resolvingBookmarkData: fileBookmark!, bookmarkDataIsStale: &isStale)
             
