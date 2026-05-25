@@ -166,33 +166,6 @@ struct EditTimerForm: View {
         }
     }
     
-    private func addTimer () {
-        withAnimation {
-            let newItem = Timer(context: viewContext)
-            newItem.timerName = newTimerName
-            
-            let textColor = UIColor(newTextColour).cgColor.components
-            newItem.textRed = Double(textColor?[0] ?? 0)
-            newItem.textGreen = Double(textColor?[1] ?? 0)
-            newItem.textBlue = Double(textColor?[2] ?? 0)
-            
-            let bgColor = UIColor(newTimerBackground).cgColor.components
-            newItem.bgRed = Double(bgColor?[0] ?? 0)
-            newItem.bgGreen = Double(bgColor?[1] ?? 0)
-            newItem.bgBlue = Double(bgColor?[2] ?? 0)
-            
-            do {
-                try viewContext.save()
-                resetState()
-            } catch {
-                // EDTODO - Replace this implementation with code to handle the error appropriately.
-                // fatalError terminates the app and creates a crash log
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
-        }
-    }
-    
     private func incrementTimeLength() {
         let currentValue = Int(newTimerLength) ?? 0
         newTimerLength = "\(currentValue + 1)"
