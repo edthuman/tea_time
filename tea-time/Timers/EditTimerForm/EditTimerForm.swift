@@ -218,7 +218,12 @@ struct EditTimerForm: View {
         do {
             let fileName = getFileNameForTimer(timer: timer)
             let url: URL = try getSoundFileURL(fileName: fileName)
-            _audioURL = State(initialValue: url)
+            
+            if fileManager.fileExists(atPath: url.path) {
+                _audioURL = State(initialValue: url)
+            } else {
+                _audioURL = State(initialValue: nil)
+            }
         }
         catch {
             printWithNewlineAbove(input: "Error initialising sound file URL")
@@ -347,16 +352,26 @@ struct EditTimerForm: View {
                     }.padding(.bottom, 10)
                 }
                 
-                Button(
-                    newAudioBookmark != nil || audioURL != nil
-                       ? "Change Audio"
-                       : "Select Audio"
-                ) {
-                    showPicker = true
+                HStack {
+                    Button(
+                        newAudioBookmark != nil || audioURL != nil
+                           ? "Change"
+                           : "Select Audio"
+                    ) {
+                        showPicker = true
+                    }
+                    .sheet(isPresented: $showPicker) {
+                        AudioPicker(audioBookmark: $newAudioBookmark, audioTooLong: $audioTooLong)
+                    }
+                    
+                    if newAudioBookmark != nil || audioURL != nil {
+                        Button("Remove") {
+                            newAudioBookmark = nil
+                            audioURL = nil
+                        }.foregroundStyle(.red)
+                    }
                 }
-                .sheet(isPresented: $showPicker) {
-                    AudioPicker(audioBookmark: $newAudioBookmark, audioTooLong: $audioTooLong)
-                }.padding(.bottom, 20)
+                .padding(.bottom, 20)
                 
                 HStack {
                     Button(action: resetState) {
