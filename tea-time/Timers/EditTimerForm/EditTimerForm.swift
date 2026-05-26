@@ -22,6 +22,9 @@ struct EditTimerForm: View {
     @State private var newTextColour: Color
     @State private var newTimerBackground: Color
     @State private var showPicker = false
+
+    @State private var audioURL: URL? = nil
+
     @State private var newAudioBookmark: Data? = nil
     @State private var audioTooLong: Bool = false
     
@@ -35,6 +38,7 @@ struct EditTimerForm: View {
         appState.setTimerBeingEdited(nil)
         isPresented = false
         newAudioBookmark = nil
+        audioURL = nil
     }
     
     private func getSecondsFromInput() -> Int64 {
@@ -92,7 +96,7 @@ struct EditTimerForm: View {
             do {
                 try viewContext.save()
 
-                let fileName = timer.objectID.uriRepresentation().lastPathComponent
+                let fileName = getFileNameForTimer(timer: timer)
                 saveNotificationSound(fileBookmark: newAudioBookmark, fileName: fileName)
 
                 resetState()
@@ -103,6 +107,10 @@ struct EditTimerForm: View {
                 fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
             }
         }
+    }
+    
+    private func getFileNameForTimer (timer: Timer) -> String {
+        return timer.objectID.uriRepresentation().lastPathComponent
     }
     
     private func getSoundsDirectoryURL() throws -> URL {
@@ -200,6 +208,24 @@ struct EditTimerForm: View {
         return String(zeroesRemoved)
     }
     
+    private mutating func intialiseTimerFileURL() {
+        let timer = appState.timerBeingEdited
+        
+        guard let timer = timer else {
+            return
+        }
+        
+        do {
+            let fileName = getFileNameForTimer(timer: timer)
+            let url: URL = try getSoundFileURL(fileName: fileName)
+            _audioURL = State(initialValue: url)
+        }
+        catch {
+            printWithNewlineAbove(input: "Error initialising sound file URL")
+            _audioURL = State(initialValue: nil)
+        }
+    }
+    
     init(isPresented: Binding<Bool>) {
         self._isPresented = isPresented
         let timer = appState.timerBeingEdited
@@ -230,6 +256,7 @@ struct EditTimerForm: View {
         if let timer = timer {
             _newTextColour = State(initialValue: Color(red: timer.textRed, green: timer.textGreen, blue: timer.textBlue))
             _newTimerBackground = State(initialValue: Color(red: timer.bgRed, green: timer.bgGreen, blue: timer.bgBlue))
+            intialiseTimerFileURL()
         } else {
             _newTextColour = State(initialValue: .white)
             _newTimerBackground = State(initialValue: .placeholderBackground)
@@ -308,6 +335,13 @@ struct EditTimerForm: View {
                 }
                 .padding(.vertical, 20)
                 
+                if let audioURL = audioURL {
+                    HStack (spacing: 10) {
+                        Text("Preview audio")
+                        AudioPlayer(audioURL: audioURL)
+                    }.padding(.bottom, 10)
+                }
+                
                 if let audioBookmark = newAudioBookmark {
                     HStack (spacing: 10) {
                         Text("Preview audio")
@@ -315,7 +349,11 @@ struct EditTimerForm: View {
                     }.padding(.bottom, 10)
                 }
                 
-                Button(newAudioBookmark != nil ? "Change Audio" : "Select Audio") {
+                Button(
+                    newAudioBookmark != nil || audioURL != nil
+                       ? "Change Audio"
+                       : "Select Audio"
+                ) {
                     showPicker = true
                 }
                 .sheet(isPresented: $showPicker) {

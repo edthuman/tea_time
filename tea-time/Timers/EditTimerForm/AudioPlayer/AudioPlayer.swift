@@ -62,6 +62,7 @@ struct AudioPlayer: View {
     @StateObject var player = AudioPlayerManager()
     
     var audioBookmark: Data?
+    var audioURL: URL?
 
     private func getURLFromBookmark() -> URL? {
         guard let data = audioBookmark else { return nil }
@@ -86,14 +87,17 @@ struct AudioPlayer: View {
     
     var body: some View {
         Button {
-            if audioBookmark == nil {
+            if audioBookmark == nil && audioURL == nil {
                 return
             }
-            var url: URL?
-            if let urlFromBookmark = getURLFromBookmark() {
-                url = urlFromBookmark
-            } else {
-                return
+            
+            var url: URL? = audioURL
+            if audioBookmark != nil {
+                if let urlFromBookmark = getURLFromBookmark() {
+                    url = urlFromBookmark
+                } else {
+                    return
+                }
             }
             
             guard let url = url else { return }
@@ -106,6 +110,6 @@ struct AudioPlayer: View {
         } label: {
             Image(systemName: player.isPlaying ? "stop.fill" : "play.fill")
         }
-        .disabled(audioBookmark == nil)
+        .disabled(audioBookmark == nil && audioURL == nil)
     }
 }
