@@ -7,9 +7,9 @@ enum TimePeriods {
     case hours;
 }
 
-let fileManager = FileManager()
-
 struct EditTimerForm: View {
+    private let fileManager = FileManager.default
+    
     @ObservedObject var state = appState
     @Environment(\.managedObjectContext) private var viewContext
     
