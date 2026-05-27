@@ -109,3 +109,13 @@ func getSoundFileURL(fileName: String) throws -> URL {
         .appendingPathComponent(fileName)
     return soundFileURL
 }
+
+func deleteSoundFile(fileName: String) throws {
+    let fileManager = FileManager.default
+    
+    let soundFileURL = try getSoundFileURL(fileName: fileName)
+    
+    if fileManager.fileExists(atPath: soundFileURL.path()) {
+        try fileManager.removeItem(at: soundFileURL)
+    }
+}

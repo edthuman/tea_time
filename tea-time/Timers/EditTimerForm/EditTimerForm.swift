@@ -121,10 +121,7 @@ struct EditTimerForm: View {
             let soundFileURL: URL = try getSoundFileURL(fileName: fileName)
                 
             if fileBookmark == nil {
-                if fileManager.fileExists(atPath: soundFileURL.path()) {
-                    // Deleting existing notification sound if removed
-                    try fileManager.removeItem(at: soundFileURL)
-                }
+                try deleteSoundFile(fileName: fileName)
                 return
             }
             
