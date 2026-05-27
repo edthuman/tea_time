@@ -359,7 +359,7 @@ struct EditTimerForm: View {
                     }.padding(.bottom, 10)
                 }
                 
-                HStack {
+                HStack (spacing: 20) {
                     Button(
                         audioBookmark != nil || audioURL != nil
                            ? "Change"
