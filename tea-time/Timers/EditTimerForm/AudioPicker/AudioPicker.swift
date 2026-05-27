@@ -47,7 +47,6 @@ struct AudioPicker: UIViewControllerRepresentable {
 
                     parent.audioBookmark = bookmarkData
                     parent.isChanged = true
-                    printWithNewlineAbove(input: "isChanged == true!")
                 } catch {
                     print("Failed to create bookmark: \(error)")
                 }
