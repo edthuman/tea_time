@@ -79,3 +79,33 @@ func createNotification(title: String, description: String, playSound: Bool, tim
     let request = UNNotificationRequest(identifier: uuid, content: content, trigger: nil)
     return request
 }
+
+func getFileNameForTimer (timer: Timer) -> String {
+    return timer.objectID.uriRepresentation().lastPathComponent
+}
+
+func getSoundsDirectoryURL() throws -> URL {
+    let fileManager = FileManager.default
+    
+    let soundsDirectoryURL = fileManager.urls(
+        for: .libraryDirectory,
+        in: .userDomainMask
+    )
+    .first!
+    .appendingPathComponent("Sounds")
+    
+    try fileManager.createDirectory(
+        at: soundsDirectoryURL,
+        withIntermediateDirectories: true,
+        attributes: nil
+    )
+    return soundsDirectoryURL
+}
+
+func getSoundFileURL(fileName: String) throws -> URL {
+    let soundsDirectoryURL = try getSoundsDirectoryURL()
+
+    let soundFileURL = soundsDirectoryURL
+        .appendingPathComponent(fileName)
+    return soundFileURL
+}

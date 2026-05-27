@@ -111,34 +111,6 @@ struct EditTimerForm: View {
         }
     }
     
-    private func getFileNameForTimer (timer: Timer) -> String {
-        return timer.objectID.uriRepresentation().lastPathComponent
-    }
-    
-    private func getSoundsDirectoryURL() throws -> URL {
-        let soundsDirectoryURL = fileManager.urls(
-            for: .libraryDirectory,
-            in: .userDomainMask
-        )
-        .first!
-        .appendingPathComponent("Sounds")
-        
-        try fileManager.createDirectory(
-            at: soundsDirectoryURL,
-            withIntermediateDirectories: true,
-            attributes: nil
-        )
-        return soundsDirectoryURL
-    }
-    
-    private func getSoundFileURL(fileName: String) throws -> URL {
-        let soundsDirectoryURL = try getSoundsDirectoryURL()
-
-        let soundFileURL = soundsDirectoryURL
-            .appendingPathComponent(fileName)
-        return soundFileURL
-    }
-    
     private func saveNotificationSound(fileBookmark: Data?, fileName: String) {
         if hasAudioChanged == false {
             // Prevent re-saving of audio from bookmark when the file is not changed
