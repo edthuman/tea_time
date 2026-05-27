@@ -6,6 +6,7 @@ import UniformTypeIdentifiers
 struct AudioPicker: UIViewControllerRepresentable {
     @Binding var audioBookmark: Data?
     @Binding var audioTooLong: Bool
+    @Binding var isChanged: Bool
     
     func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
         let picker = UIDocumentPickerViewController(forOpeningContentTypes: [.audio], asCopy: false)
@@ -45,6 +46,8 @@ struct AudioPicker: UIViewControllerRepresentable {
                         relativeTo: nil)
 
                     parent.audioBookmark = bookmarkData
+                    parent.isChanged = true
+                    printWithNewlineAbove(input: "isChanged == true!")
                 } catch {
                     print("Failed to create bookmark: \(error)")
                 }

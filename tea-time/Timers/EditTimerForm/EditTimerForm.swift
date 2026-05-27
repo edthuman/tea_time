@@ -25,7 +25,8 @@ struct EditTimerForm: View {
 
     @State private var audioURL: URL? = nil
 
-    @State private var newAudioBookmark: Data? = nil
+    @State private var audioBookmark: Data? = nil
+    @State private var hasAudioChanged: Bool = false
     @State private var audioTooLong: Bool = false
     
     private func resetState() {
@@ -37,7 +38,8 @@ struct EditTimerForm: View {
         isAdding.toggle()
         appState.setTimerBeingEdited(nil)
         isPresented = false
-        newAudioBookmark = nil
+        audioBookmark = nil
+        hasAudioChanged = false
         audioURL = nil
     }
     
@@ -97,7 +99,7 @@ struct EditTimerForm: View {
                 try viewContext.save()
 
                 let fileName = getFileNameForTimer(timer: timer)
-                saveNotificationSound(fileBookmark: newAudioBookmark, fileName: fileName)
+                saveNotificationSound(fileBookmark: audioBookmark, fileName: fileName)
 
                 resetState()
             } catch {
@@ -138,6 +140,11 @@ struct EditTimerForm: View {
     }
     
     private func saveNotificationSound(fileBookmark: Data?, fileName: String) {
+        if hasAudioChanged == false {
+            // Prevent re-saving of audio from bookmark when the file is not changed
+            return
+        }
+        
         do {
             let soundFileURL: URL = try getSoundFileURL(fileName: fileName)
                 
@@ -340,7 +347,7 @@ struct EditTimerForm: View {
                 }
                 .padding(.vertical, 20)
                 
-                if let audioBookmark = newAudioBookmark {
+                if let audioBookmark = audioBookmark {
                     HStack (spacing: 10) {
                         Text("Preview audio")
                         AudioPlayer(audioBookmark: audioBookmark)
@@ -354,20 +361,25 @@ struct EditTimerForm: View {
                 
                 HStack {
                     Button(
-                        newAudioBookmark != nil || audioURL != nil
+                        audioBookmark != nil || audioURL != nil
                            ? "Change"
                            : "Select Audio"
                     ) {
                         showPicker = true
                     }
                     .sheet(isPresented: $showPicker) {
-                        AudioPicker(audioBookmark: $newAudioBookmark, audioTooLong: $audioTooLong)
+                        AudioPicker(
+                            audioBookmark: $audioBookmark,
+                            audioTooLong: $audioTooLong,
+                            isChanged: $hasAudioChanged
+                        )
                     }
                     
-                    if newAudioBookmark != nil || audioURL != nil {
+                    if audioBookmark != nil || audioURL != nil {
                         Button("Remove") {
-                            newAudioBookmark = nil
+                            audioBookmark = nil
                             audioURL = nil
+                            hasAudioChanged = true
                         }.foregroundStyle(.red)
                     }
                 }
