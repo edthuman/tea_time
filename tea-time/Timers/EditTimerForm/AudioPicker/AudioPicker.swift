@@ -9,7 +9,10 @@ struct AudioPicker: UIViewControllerRepresentable {
     @Binding var isChanged: Bool
     
     func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
-        let picker = UIDocumentPickerViewController(forOpeningContentTypes: [.audio], asCopy: false)
+        let picker = UIDocumentPickerViewController(
+            forOpeningContentTypes: [.audio],
+            asCopy: true
+        )
         picker.delegate = context.coordinator
         return picker
     }
@@ -22,28 +25,30 @@ struct AudioPicker: UIViewControllerRepresentable {
 
     class Coordinator: NSObject, UIDocumentPickerDelegate {
         var parent: AudioPicker
+        var fileURL: URL?
 
         init(parent: AudioPicker) {
             self.parent = parent
         }
         
         func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
-            guard let url = urls.first else { return }
-
-            guard url.startAccessingSecurityScopedResource() else { return }
-            defer { url.stopAccessingSecurityScopedResource() }
+            guard let fileURL = urls.first else { return }
+            guard fileURL.startAccessingSecurityScopedResource() else { return }
 
             Task {
-                if (await checkAudioLengthValid(url: url)) == false {
+                defer { fileURL.stopAccessingSecurityScopedResource() }
+                
+                if (await checkAudioLengthValid(url: fileURL)) == false {
                     parent.audioTooLong = true
                     return
                 }
 
                 do {
-                    let bookmarkData: Data = try url.bookmarkData(
+                    let bookmarkData: Data = try fileURL.bookmarkData(
                         options: .minimalBookmark,
                         includingResourceValuesForKeys: nil,
-                        relativeTo: nil)
+                        relativeTo: nil
+                    )
 
                     parent.audioBookmark = bookmarkData
                     parent.isChanged = true
