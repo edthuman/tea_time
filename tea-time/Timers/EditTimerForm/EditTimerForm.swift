@@ -312,7 +312,7 @@ struct EditTimerForm: View {
                             .tag(TimePeriods.minutes)
                         Text(newTimerLength == "1" ? "hour" : "hours")
                             .tag(TimePeriods.hours)
-                    }
+                    }.fixedSize()
                 }
                 .padding(.vertical, 20)
                 
