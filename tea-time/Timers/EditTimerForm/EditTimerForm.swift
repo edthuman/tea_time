@@ -123,16 +123,18 @@ struct EditTimerForm: View {
                 return
             }
                 
-            // Delete existing file - to allow copyItem to write new file
-            if fileManager.fileExists(atPath: soundFileURL.path()) {
-                try fileManager.removeItem(at: soundFileURL)
-            }
             
-            // Save new audio
-            try FileManager.default.copyItem(
-                at: url,
-                to: soundFileURL,
-            )
+            if fileManager.fileExists(atPath: soundFileURL.path) {
+                _ = try fileManager.replaceItemAt(
+                    soundFileURL,
+                    withItemAt: url
+                )
+            } else {
+                try fileManager.copyItem(
+                    at: url,
+                    to: soundFileURL,
+                )
+            }
         }
         catch {
             printWithNewlineAbove(input: "Failed to create audio file:\n \(error)\n")
