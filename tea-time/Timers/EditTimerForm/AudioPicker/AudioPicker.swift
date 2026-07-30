@@ -4,7 +4,7 @@ import UIKit
 import UniformTypeIdentifiers
 
 struct AudioPicker: UIViewControllerRepresentable {
-    @Binding var audioBookmark: Data?
+    @Binding var audioURL: URL?
     @Binding var audioTooLong: Bool
     @Binding var isChanged: Bool
     
@@ -33,28 +33,14 @@ struct AudioPicker: UIViewControllerRepresentable {
         
         func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
             guard let fileURL = urls.first else { return }
-            guard fileURL.startAccessingSecurityScopedResource() else { return }
 
             Task {
-                defer { fileURL.stopAccessingSecurityScopedResource() }
-                
                 if (await checkAudioLengthValid(url: fileURL)) == false {
                     parent.audioTooLong = true
                     return
                 }
-
-                do {
-                    let bookmarkData: Data = try fileURL.bookmarkData(
-                        options: .minimalBookmark,
-                        includingResourceValuesForKeys: nil,
-                        relativeTo: nil
-                    )
-
-                    parent.audioBookmark = bookmarkData
-                    parent.isChanged = true
-                } catch {
-                    print("Failed to create bookmark: \(error)")
-                }
+                parent.audioURL = fileURL
+                parent.isChanged = true
             }
         }
         

@@ -15,13 +15,9 @@ class AudioPlayerManager: NSObject, ObservableObject, AVAudioPlayerDelegate {
         if currentPlayingURL != nil {
             cleanUpAudioResources()
         }
+        currentPlayingURL = url
         
         try? AVAudioSession.sharedInstance().setActive(true)
-        
-        let canAccess = url.startAccessingSecurityScopedResource()
-        if canAccess {
-            currentPlayingURL = url
-        }
 
         do {
             isPlaying = true
@@ -48,7 +44,6 @@ class AudioPlayerManager: NSObject, ObservableObject, AVAudioPlayerDelegate {
         audioPlayer = nil
         
         if let url = currentPlayingURL {
-            url.stopAccessingSecurityScopedResource()
             currentPlayingURL = nil
         }
     }
@@ -60,47 +55,13 @@ class AudioPlayerManager: NSObject, ObservableObject, AVAudioPlayerDelegate {
 
 struct AudioPlayer: View {
     @StateObject var player = AudioPlayerManager()
-    
-    var audioBookmark: Data?
-    var audioURL: URL?
 
-    private func getURLFromBookmark() -> URL? {
-        guard let data = audioBookmark else { return nil }
-        
-        var isStale = false
-        do {
-            let url = try URL(resolvingBookmarkData: data,
-                              options: [],
-                              relativeTo: nil,
-                              bookmarkDataIsStale: &isStale)
-            
-            if isStale {
-                // EDTODO - add handling for stale bookmark
-            }
-            
-            return url
-        } catch {
-            print("Could not resolve bookmark: \(error)")
-            return nil
-        }
-    }
+    var audioURL: URL?
     
     var body: some View {
         Button {
-            if audioBookmark == nil && audioURL == nil {
-                return
-            }
-            
-            var url: URL? = audioURL
-            if audioBookmark != nil {
-                if let urlFromBookmark = getURLFromBookmark() {
-                    url = urlFromBookmark
-                } else {
-                    return
-                }
-            }
-            
-            guard let url = url else { return }
+            guard let url: URL = audioURL else { return }
+
             if player.isPlaying {
                 player.stopAudio()
             } else {
@@ -110,6 +71,6 @@ struct AudioPlayer: View {
         } label: {
             Image(systemName: player.isPlaying ? "stop.fill" : "play.fill")
         }
-        .disabled(audioBookmark == nil && audioURL == nil)
+        .disabled(audioURL == nil)
     }
 }

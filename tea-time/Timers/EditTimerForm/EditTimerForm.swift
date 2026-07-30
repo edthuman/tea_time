@@ -24,8 +24,6 @@ struct EditTimerForm: View {
     @State private var showPicker = false
 
     @State private var audioURL: URL? = nil
-
-    @State private var audioBookmark: Data? = nil
     @State private var hasAudioChanged: Bool = false
     @State private var audioTooLong: Bool = false
     
@@ -38,7 +36,6 @@ struct EditTimerForm: View {
         isAdding.toggle()
         appState.setTimerBeingEdited(nil)
         isPresented = false
-        audioBookmark = nil
         hasAudioChanged = false
         audioURL = nil
     }
@@ -99,7 +96,7 @@ struct EditTimerForm: View {
                 try viewContext.save()
 
                 let fileName = getFileNameForTimer(timer: timer)
-                saveNotificationSound(fileBookmark: audioBookmark, fileName: fileName)
+                saveNotificationSound(fileURL: audioURL, fileName: fileName)
 
                 resetState()
             } catch {
@@ -111,7 +108,7 @@ struct EditTimerForm: View {
         }
     }
     
-    private func saveNotificationSound(fileBookmark: Data?, fileName: String) {
+    private func saveNotificationSound(fileURL: URL?, fileName: String) {
         if hasAudioChanged == false {
             // Prevent re-saving of audio from bookmark when the file is not changed
             return
@@ -120,30 +117,22 @@ struct EditTimerForm: View {
         do {
             let soundFileURL: URL = try getSoundFileURL(fileName: fileName)
                 
-            if fileBookmark == nil {
+            guard let url = fileURL else {
+                // Sound removed from timer
                 try deleteSoundFile(fileName: fileName)
                 return
             }
-            
-            var isStale: Bool = false
-            let bookmarkURL = try URL(resolvingBookmarkData: fileBookmark!, bookmarkDataIsStale: &isStale)
-            
-            if (bookmarkURL.startAccessingSecurityScopedResource()) {
-                defer {
-                    bookmarkURL.stopAccessingSecurityScopedResource()
-                }
                 
-                // Delete existing file if it already exists
-                if fileManager.fileExists(atPath: soundFileURL.path()) {
-                    try fileManager.removeItem(at: soundFileURL)
-                }
-                
-                // Copy selected file into
-                try FileManager.default.copyItem(
-                    at: bookmarkURL,
-                    to: soundFileURL,
-                )
+            // Delete existing file - to allow copyItem to write new file
+            if fileManager.fileExists(atPath: soundFileURL.path()) {
+                try fileManager.removeItem(at: soundFileURL)
             }
+            
+            // Save new audio
+            try FileManager.default.copyItem(
+                at: url,
+                to: soundFileURL,
+            )
         }
         catch {
             printWithNewlineAbove(input: "Failed to create audio file:\n \(error)\n")
@@ -319,9 +308,7 @@ struct EditTimerForm: View {
                 HStack (spacing: 10) {
                     Text("Preview audio")
                     
-                    if let audioBookmark = audioBookmark {
-                        AudioPlayer(audioBookmark: audioBookmark)
-                    } else if let audioURL = audioURL {
+                    if let audioURL = audioURL {
                         AudioPlayer(audioURL: audioURL)
                     }
                 }
@@ -329,7 +316,7 @@ struct EditTimerForm: View {
                 
                 HStack (spacing: 20) {
                     Button(
-                        audioBookmark != nil || audioURL != nil
+                        audioURL != nil
                            ? "Change"
                            : "Select Audio"
                     ) {
@@ -337,15 +324,14 @@ struct EditTimerForm: View {
                     }
                     .sheet(isPresented: $showPicker) {
                         AudioPicker(
-                            audioBookmark: $audioBookmark,
+                            audioURL: $audioURL,
                             audioTooLong: $audioTooLong,
                             isChanged: $hasAudioChanged
                         )
                     }
                     
-                    if audioBookmark != nil || audioURL != nil {
+                    if audioURL != nil {
                         Button("Remove") {
-                            audioBookmark = nil
                             audioURL = nil
                             hasAudioChanged = true
                         }.foregroundStyle(.red)
