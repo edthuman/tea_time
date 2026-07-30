@@ -2,9 +2,9 @@ import SwiftUI
 import CoreData
 
 enum TimePeriods {
-    case seconds;
-    case minutes;
-    case hours;
+    case seconds
+    case minutes
+    case hours
 }
 
 struct EditTimerForm: View {
