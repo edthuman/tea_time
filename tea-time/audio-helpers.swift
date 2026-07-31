@@ -4,6 +4,10 @@ func getFileNameForTimer (timer: Timer) -> String {
     return timer.objectID.uriRepresentation().lastPathComponent
 }
 
+func getFileNameForFolder (folder: Folder) -> String {
+    return folder.objectID.uriRepresentation().lastPathComponent
+}
+
 func getSoundsDirectoryURL() throws -> URL {
     let fileManager = FileManager.default
 

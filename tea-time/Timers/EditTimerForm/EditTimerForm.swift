@@ -21,9 +21,9 @@ struct EditTimerForm: View {
     @State private var selectedTimePeriod: TimePeriods
     @State private var newTextColour: Color
     @State private var newTimerBackground: Color
-    @State private var showPicker = false
-
+    
     @State private var audioURL: URL? = nil
+    @State private var showPicker = false
     @State private var hasAudioChanged: Bool = false
     @State private var audioTooLong: Bool = false
     
