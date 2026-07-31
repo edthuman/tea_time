@@ -1,0 +1,76 @@
+import SwiftUI
+
+func getFileNameForTimer (timer: Timer) -> String {
+    return timer.objectID.uriRepresentation().lastPathComponent
+}
+
+func getSoundsDirectoryURL() throws -> URL {
+    let fileManager = FileManager.default
+
+    let soundsDirectoryURL = fileManager.urls(
+        for: .libraryDirectory,
+        in: .userDomainMask
+    )
+    .first!
+    .appendingPathComponent("Sounds")
+
+    try fileManager.createDirectory(
+        at: soundsDirectoryURL,
+        withIntermediateDirectories: true,
+        attributes: nil
+    )
+    return soundsDirectoryURL
+}
+
+func getSoundFileURL(fileName: String) throws -> URL {
+    let soundsDirectoryURL = try getSoundsDirectoryURL()
+
+    let soundFileURL = soundsDirectoryURL
+        .appendingPathComponent(fileName)
+    return soundFileURL
+}
+
+func deleteSoundFile(fileName: String) throws {
+    let fileManager = FileManager.default
+
+    let soundFileURL = try getSoundFileURL(fileName: fileName)
+
+    if fileManager.fileExists(atPath: soundFileURL.path()) {
+        try fileManager.removeItem(at: soundFileURL)
+    }
+}
+
+func saveNotificationSound(fileURL: URL?, fileName: String, hasAudioChanged: Bool) {
+    let fileManager = FileManager.default
+    
+    if hasAudioChanged == false {
+        // Prevent re-saving of audio from bookmark when the file is not changed
+        return
+    }
+    
+    do {
+        let soundFileURL: URL = try getSoundFileURL(fileName: fileName)
+            
+        guard let url = fileURL else {
+            // Sound removed from timer
+            try deleteSoundFile(fileName: fileName)
+            return
+        }
+            
+        
+        if fileManager.fileExists(atPath: soundFileURL.path) {
+            _ = try fileManager.replaceItemAt(
+                soundFileURL,
+                withItemAt: url
+            )
+        } else {
+            try fileManager.copyItem(
+                at: url,
+                to: soundFileURL,
+            )
+        }
+    }
+    catch {
+        printWithNewlineAbove(input: "Failed to create audio file:\n \(error)\n")
+    }
+}

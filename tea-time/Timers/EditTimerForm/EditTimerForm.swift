@@ -96,7 +96,7 @@ struct EditTimerForm: View {
                 try viewContext.save()
 
                 let fileName = getFileNameForTimer(timer: timer)
-                saveNotificationSound(fileURL: audioURL, fileName: fileName)
+                saveNotificationSound(fileURL: audioURL, fileName: fileName, hasAudioChanged: hasAudioChanged)
 
                 resetState()
             } catch {
@@ -105,39 +105,6 @@ struct EditTimerForm: View {
                 let nsError = error as NSError
                 fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
             }
-        }
-    }
-    
-    private func saveNotificationSound(fileURL: URL?, fileName: String) {
-        if hasAudioChanged == false {
-            // Prevent re-saving of audio from bookmark when the file is not changed
-            return
-        }
-        
-        do {
-            let soundFileURL: URL = try getSoundFileURL(fileName: fileName)
-                
-            guard let url = fileURL else {
-                // Sound removed from timer
-                try deleteSoundFile(fileName: fileName)
-                return
-            }
-                
-            
-            if fileManager.fileExists(atPath: soundFileURL.path) {
-                _ = try fileManager.replaceItemAt(
-                    soundFileURL,
-                    withItemAt: url
-                )
-            } else {
-                try fileManager.copyItem(
-                    at: url,
-                    to: soundFileURL,
-                )
-            }
-        }
-        catch {
-            printWithNewlineAbove(input: "Failed to create audio file:\n \(error)\n")
         }
     }
     
