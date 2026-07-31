@@ -307,14 +307,16 @@ struct EditTimerForm: View {
                 }
                 .padding(.vertical, 20)
                 
-                HStack (spacing: 10) {
-                    Text("Preview audio")
-                    
-                    if let audioURL = audioURL {
-                        AudioPlayer(audioURL: audioURL)
+                if audioURL != nil {
+                    HStack (spacing: 10) {
+                        Text("Preview audio")
+                        
+                        if let audioURL = audioURL {
+                            AudioPlayer(audioURL: audioURL)
+                        }
                     }
+                    .padding(.bottom, 10)
                 }
-                .padding(.bottom, 10)
                 
                 HStack (spacing: 20) {
                     Button(
