@@ -16,6 +16,7 @@
         <attribute name="bgRed" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="colour" optional="YES" attributeType="String"/>
         <attribute name="seconds" optional="YES" attributeType="Integer 64" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="soundURL" optional="YES" attributeType="String"/>
         <attribute name="textBlue" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="textGreen" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="textRed" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>

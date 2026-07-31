@@ -58,8 +58,14 @@ struct Folders: View {
             
             func deleteFolder() {
                 if let folder = folder {
-                    viewContext.delete(folder)
                     do {
+                        if let timers = folder.timers as? Set<Timer> {
+                            for timer in timers {
+                                let soundFileName = getFileNameForTimer(timer: timer)
+                                try deleteSoundFile(fileName: soundFileName)
+                            }
+                        }
+                        viewContext.delete(folder)
                         try viewContext.save()
                     } catch {
                         // EDTODO - Replace this implementation with code to handle the error appropriately.

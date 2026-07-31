@@ -58,8 +58,13 @@ func createNotification(title: String, description: String, playSound: Bool, tim
         // add default sound to notification config
         let soundName = UNNotificationSoundName(rawValue: "_mary.wav")
         content.sound = UNNotificationSound(named: soundName)
-    } else if (playSound) {
+    } else if (playSound && timer.folder?.folderName == "Ed") {
         let soundName = UNNotificationSoundName(rawValue: "_ed.wav")
+        content.sound = UNNotificationSound(named: soundName)
+    } else if (playSound) {
+        let soundName = UNNotificationSoundName(
+            rawValue: timer.objectID.uriRepresentation().lastPathComponent
+        )
         content.sound = UNNotificationSound(named: soundName)
     }
     
@@ -73,4 +78,44 @@ func createNotification(title: String, description: String, playSound: Bool, tim
     // send notification immediately
     let request = UNNotificationRequest(identifier: uuid, content: content, trigger: nil)
     return request
+}
+
+func getFileNameForTimer (timer: Timer) -> String {
+    return timer.objectID.uriRepresentation().lastPathComponent
+}
+
+func getSoundsDirectoryURL() throws -> URL {
+    let fileManager = FileManager.default
+    
+    let soundsDirectoryURL = fileManager.urls(
+        for: .libraryDirectory,
+        in: .userDomainMask
+    )
+    .first!
+    .appendingPathComponent("Sounds")
+    
+    try fileManager.createDirectory(
+        at: soundsDirectoryURL,
+        withIntermediateDirectories: true,
+        attributes: nil
+    )
+    return soundsDirectoryURL
+}
+
+func getSoundFileURL(fileName: String) throws -> URL {
+    let soundsDirectoryURL = try getSoundsDirectoryURL()
+
+    let soundFileURL = soundsDirectoryURL
+        .appendingPathComponent(fileName)
+    return soundFileURL
+}
+
+func deleteSoundFile(fileName: String) throws {
+    let fileManager = FileManager.default
+    
+    let soundFileURL = try getSoundFileURL(fileName: fileName)
+    
+    if fileManager.fileExists(atPath: soundFileURL.path()) {
+        try fileManager.removeItem(at: soundFileURL)
+    }
 }

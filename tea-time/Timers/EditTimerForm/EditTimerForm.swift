@@ -2,12 +2,14 @@ import SwiftUI
 import CoreData
 
 enum TimePeriods {
-    case seconds;
-    case minutes;
-    case hours;
+    case seconds
+    case minutes
+    case hours
 }
 
 struct EditTimerForm: View {
+    private let fileManager = FileManager.default
+    
     @ObservedObject var state = appState
     @Environment(\.managedObjectContext) private var viewContext
     
@@ -19,6 +21,11 @@ struct EditTimerForm: View {
     @State private var selectedTimePeriod: TimePeriods
     @State private var newTextColour: Color
     @State private var newTimerBackground: Color
+    @State private var showPicker = false
+
+    @State private var audioURL: URL? = nil
+    @State private var hasAudioChanged: Bool = false
+    @State private var audioTooLong: Bool = false
     
     private func resetState() {
         newTimerName = ""
@@ -29,6 +36,8 @@ struct EditTimerForm: View {
         isAdding.toggle()
         appState.setTimerBeingEdited(nil)
         isPresented = false
+        hasAudioChanged = false
+        audioURL = nil
     }
     
     private func getSecondsFromInput() -> Int64 {
@@ -45,64 +54,50 @@ struct EditTimerForm: View {
 
     private func saveChanges () {
         withAnimation {
-            let timer: Timer? = appState.timerBeingEdited
-  
-            let timerName = newTimerName
+            var timer: Timer? = appState.timerBeingEdited
+
+            if timer == nil {
+                let newItem = Timer(context: viewContext)
+                
+                var folder: Folder?
+                if let folderId = state.folderId {
+                    folder = viewContext.object(with: folderId) as? Folder
+                }
+                newItem.folder = folder
+                timer = newItem
+            }
+            guard let timer = timer else {
+                return
+            }
             
+            timer.timerName = newTimerName
+            timer.seconds = getSecondsFromInput()
+
+            // Text colour
             let textColor = UIColor(newTextColour).cgColor.components
             let textRed = Double(textColor?[0] ?? 0)
             let textGreen = Double(textColor?[1] ?? 0)
             let textBlue = Double(textColor?[2] ?? 0)
+            timer.textRed = textRed
+            timer.textGreen = textGreen
+            timer.textBlue = textBlue
             
+            // Background colour
             let bgColor = UIColor(newTimerBackground).cgColor.components
             let bgRed = Double(bgColor?[0] ?? 0)
             let bgGreen = Double(bgColor?[1] ?? 0)
             let bgBlue = Double(bgColor?[2] ?? 0)
             
-            var folder: Folder?
-            if let folderId = state.folderId {
-                folder = viewContext.object(with: folderId) as? Folder
-            }
-            
-            if let timer = timer {
-                // Update existing timer
-                timer.timerName = timerName
-
-                timer.textRed = textRed
-                timer.textGreen = textGreen
-                timer.textBlue = textBlue
-                
-                timer.bgRed = bgRed
-                timer.bgGreen = bgGreen
-                timer.bgBlue = bgBlue
-                
-                timer.seconds = getSecondsFromInput()
-                
-                if let folder = folder {
-                    timer.folder = folder
-                }
-            } else {
-                // Create new timer
-                let newItem = Timer(context: viewContext)
-                newItem.timerName = timerName
-                
-                newItem.textRed = textRed
-                newItem.textGreen = textGreen
-                newItem.textBlue = textBlue
-                
-                newItem.bgRed = bgRed
-                newItem.bgGreen = bgGreen
-                newItem.bgBlue = bgBlue
-                
-                newItem.seconds = getSecondsFromInput()
-                
-                if let folder = folder {
-                    newItem.folder = folder
-                }
-            }
+            timer.bgRed = bgRed
+            timer.bgGreen = bgGreen
+            timer.bgBlue = bgBlue
             
             do {
                 try viewContext.save()
+
+                let fileName = getFileNameForTimer(timer: timer)
+                saveNotificationSound(fileURL: audioURL, fileName: fileName)
+
                 resetState()
             } catch {
                 // EDTODO - Replace this implementation with code to handle the error appropriately.
@@ -113,30 +108,36 @@ struct EditTimerForm: View {
         }
     }
     
-    private func addTimer () {
-        withAnimation {
-            let newItem = Timer(context: viewContext)
-            newItem.timerName = newTimerName
-            
-            let textColor = UIColor(newTextColour).cgColor.components
-            newItem.textRed = Double(textColor?[0] ?? 0)
-            newItem.textGreen = Double(textColor?[1] ?? 0)
-            newItem.textBlue = Double(textColor?[2] ?? 0)
-            
-            let bgColor = UIColor(newTimerBackground).cgColor.components
-            newItem.bgRed = Double(bgColor?[0] ?? 0)
-            newItem.bgGreen = Double(bgColor?[1] ?? 0)
-            newItem.bgBlue = Double(bgColor?[2] ?? 0)
-            
-            do {
-                try viewContext.save()
-                resetState()
-            } catch {
-                // EDTODO - Replace this implementation with code to handle the error appropriately.
-                // fatalError terminates the app and creates a crash log
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+    private func saveNotificationSound(fileURL: URL?, fileName: String) {
+        if hasAudioChanged == false {
+            // Prevent re-saving of audio from bookmark when the file is not changed
+            return
+        }
+        
+        do {
+            let soundFileURL: URL = try getSoundFileURL(fileName: fileName)
+                
+            guard let url = fileURL else {
+                // Sound removed from timer
+                try deleteSoundFile(fileName: fileName)
+                return
             }
+                
+            
+            if fileManager.fileExists(atPath: soundFileURL.path) {
+                _ = try fileManager.replaceItemAt(
+                    soundFileURL,
+                    withItemAt: url
+                )
+            } else {
+                try fileManager.copyItem(
+                    at: url,
+                    to: soundFileURL,
+                )
+            }
+        }
+        catch {
+            printWithNewlineAbove(input: "Failed to create audio file:\n \(error)\n")
         }
     }
     
@@ -174,6 +175,29 @@ struct EditTimerForm: View {
         return String(zeroesRemoved)
     }
     
+    private mutating func intialiseTimerFileURL() {
+        let timer = appState.timerBeingEdited
+        
+        guard let timer = timer else {
+            return
+        }
+        
+        do {
+            let fileName = getFileNameForTimer(timer: timer)
+            let url: URL = try getSoundFileURL(fileName: fileName)
+            
+            if fileManager.fileExists(atPath: url.path) {
+                _audioURL = State(initialValue: url)
+            } else {
+                _audioURL = State(initialValue: nil)
+            }
+        }
+        catch {
+            printWithNewlineAbove(input: "Error initialising sound file URL")
+            _audioURL = State(initialValue: nil)
+        }
+    }
+    
     init(isPresented: Binding<Bool>) {
         self._isPresented = isPresented
         let timer = appState.timerBeingEdited
@@ -201,9 +225,10 @@ struct EditTimerForm: View {
         _isAdding = State(initialValue: timer == nil)
         _newTimerName = State(initialValue: timer?.timerName ?? "")
         
-        if timer != nil {
-            _newTextColour = State(initialValue: Color(red: timer!.textRed, green: timer!.textGreen, blue: timer!.textBlue))
-            _newTimerBackground = State(initialValue: Color(red: timer!.bgRed, green: timer!.bgGreen, blue: timer!.bgBlue))
+        if let timer = timer {
+            _newTextColour = State(initialValue: Color(red: timer.textRed, green: timer.textGreen, blue: timer.textBlue))
+            _newTimerBackground = State(initialValue: Color(red: timer.bgRed, green: timer.bgGreen, blue: timer.bgBlue))
+            intialiseTimerFileURL()
         } else {
             _newTextColour = State(initialValue: .white)
             _newTimerBackground = State(initialValue: .placeholderBackground)
@@ -238,6 +263,14 @@ struct EditTimerForm: View {
                     )
                     .padding(.bottom, 10)
                 
+                ColorPicker("Text Colour", selection: $newTextColour)
+                    .frame(width: screenWidth * 0.45)
+                    .padding(.top, 5)
+                    .padding(.vertical, 10)
+                
+                ColorPicker("Background Colour", selection: $newTimerBackground)
+                    .frame(width: screenWidth * 0.45)
+                    .padding(.top, 10)
                 
                 HStack (spacing: 20) {
                     Button {
@@ -270,27 +303,55 @@ struct EditTimerForm: View {
                             .tag(TimePeriods.minutes)
                         Text(newTimerLength == "1" ? "hour" : "hours")
                             .tag(TimePeriods.hours)
+                    }.fixedSize()
+                }
+                .padding(.vertical, 20)
+                
+                if audioURL != nil {
+                    HStack (spacing: 10) {
+                        Text("Preview audio")
+                        
+                        if let audioURL = audioURL {
+                            AudioPlayer(audioURL: audioURL)
+                        }
                     }
+                    .padding(.bottom, 10)
                 }
                 
-                ColorPicker("Text Colour", selection: $newTextColour)
-                    .frame(width: screenWidth * 0.45)
-                    .padding(.top, 5)
-                    .padding(.vertical, 10)
-                
-                ColorPicker("Background Colour", selection: $newTimerBackground)
-                    .frame(width: screenWidth * 0.45)
-                    .padding(.vertical, 10)
+                HStack (spacing: 20) {
+                    Button(
+                        audioURL != nil
+                           ? "Change"
+                           : "Select Audio"
+                    ) {
+                        showPicker = true
+                    }
+                    .sheet(isPresented: $showPicker) {
+                        AudioPicker(
+                            audioURL: $audioURL,
+                            audioTooLong: $audioTooLong,
+                            isChanged: $hasAudioChanged
+                        )
+                    }
+                    
+                    if audioURL != nil {
+                        Button("Remove") {
+                            audioURL = nil
+                            hasAudioChanged = true
+                        }.foregroundStyle(.red)
+                    }
+                }
+                .padding(.bottom, 20)
                 
                 HStack {
-                    Button(action: resetState) {
-                        Text("Cancel")
-                            .foregroundStyle(.red)
+                    Button("Cancel") {
+                        resetState()
                     }
+                    .foregroundStyle(.red)
                     .padding(.trailing, 20)
                     
-                    Button(action: saveChanges) {
-                        Text("Confirm")
+                    Button("Confirm") {
+                        saveChanges()
                     }
                 }
                 .padding(.top, 5)
@@ -299,6 +360,22 @@ struct EditTimerForm: View {
                 width: screenWidth,
                 height: screenHeight * 0.95
             )
+            .alert(isPresented: $audioTooLong) {
+                func hideAlert() {
+                    audioTooLong = false
+                }
+                
+                return Alert(
+                    title: Text("Selected audio was too long"),
+                    message: Text(
+                        "Notification sounds cannot be longer than 30 seconds"
+                    ),
+                    dismissButton: .default(
+                        Text("But I liked that audio... 😞"),
+                        action: hideAlert
+                    )
+                )
+            }
         }
     }
 }

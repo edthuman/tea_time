@@ -85,8 +85,11 @@ struct Timers: View {
                 
                 func deleteTimer() {
                     if let timer = timer {
+                        let fileName = getFileNameForTimer(timer: timer)
                         viewContext.delete(timer)
+                        
                         do {
+                            try deleteSoundFile(fileName: fileName)
                             try viewContext.save()
                         } catch {
                             // EDTODO - Replace this implementation with code to handle the error appropriately.
