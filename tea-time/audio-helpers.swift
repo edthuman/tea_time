@@ -1,5 +1,7 @@
 import SwiftUI
 
+private let fileManager = FileManager.default
+
 func getFileNameForTimer (timer: Timer) -> String {
     return timer.objectID.uriRepresentation().lastPathComponent
 }
@@ -9,8 +11,6 @@ func getFileNameForFolder (folder: Folder) -> String {
 }
 
 func getSoundsDirectoryURL() throws -> URL {
-    let fileManager = FileManager.default
-
     let soundsDirectoryURL = fileManager.urls(
         for: .libraryDirectory,
         in: .userDomainMask
@@ -35,8 +35,6 @@ func getSoundFileURL(fileName: String) throws -> URL {
 }
 
 func deleteSoundFile(fileName: String) throws {
-    let fileManager = FileManager.default
-
     let soundFileURL = try getSoundFileURL(fileName: fileName)
 
     if fileManager.fileExists(atPath: soundFileURL.path()) {
@@ -45,8 +43,6 @@ func deleteSoundFile(fileName: String) throws {
 }
 
 func saveNotificationSound(fileURL: URL?, fileName: String, hasAudioChanged: Bool) {
-    let fileManager = FileManager.default
-    
     if hasAudioChanged == false {
         // Prevent re-saving of audio from bookmark when the file is not changed
         return
@@ -76,5 +72,18 @@ func saveNotificationSound(fileURL: URL?, fileName: String, hasAudioChanged: Boo
     }
     catch {
         printWithNewlineAbove(input: "Failed to create audio file:\n \(error)\n")
+    }
+}
+
+func checkFileExists(fileName: String) -> Bool {
+    do {
+        let soundFileURL = try getSoundFileURL(fileName: fileName)
+        return fileManager.fileExists(atPath: soundFileURL.path)
+    }
+    catch {
+        // Add proper error handling
+        let nsError = error as NSError
+        printWithNewlineAbove(input: "Error occurred whilst checking if sound file exists \(nsError), \(nsError.userInfo)")
+        return false
     }
 }

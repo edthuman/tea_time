@@ -62,10 +62,12 @@ func createNotification(title: String, description: String, playSound: Bool, tim
         let soundName = UNNotificationSoundName(rawValue: "_ed.wav")
         content.sound = UNNotificationSound(named: soundName)
     } else if (playSound) {
-        let soundName = UNNotificationSoundName(
-            rawValue: timer.objectID.uriRepresentation().lastPathComponent
+        let soundName: String = getTimerSoundName(timer: timer)
+        let notifcationSoundName = UNNotificationSoundName(
+            rawValue: soundName
         )
-        content.sound = UNNotificationSound(named: soundName)
+        
+        content.sound = UNNotificationSound(named: notifcationSoundName)
     }
     
     if (timeDelay != nil) {
@@ -78,4 +80,23 @@ func createNotification(title: String, description: String, playSound: Bool, tim
     // send notification immediately
     let request = UNNotificationRequest(identifier: uuid, content: content, trigger: nil)
     return request
+}
+
+func getTimerSoundName(timer: Timer) -> String {
+    let timerFileName = getFileNameForTimer(timer: timer)
+    let timerSoundExists = checkFileExists(fileName: timerFileName)
+    if (timerSoundExists) {
+        return timerFileName
+    }
+    
+    let folder = timer.folder
+    if let folder = folder {
+        let folderFileName = getFileNameForFolder(folder: folder)
+        let folderSoundExists = checkFileExists(fileName: folderFileName)
+        if (folderSoundExists) {
+            return folderFileName
+        }
+    }
+
+    return timerFileName
 }
