@@ -228,22 +228,7 @@ struct EditFolderForm: View {
                 width: screenWidth,
                 height: screenHeight * 0.95
             )
-            .alert(isPresented: $audioTooLong) {
-                func hideAlert() {
-                    audioTooLong = false
-                }
-                
-                return Alert(
-                    title: Text("Selected audio was too long"),
-                    message: Text(
-                        "Notification sounds cannot be longer than 30 seconds"
-                    ),
-                    dismissButton: .default(
-                        Text("But I liked that audio... 😞"),
-                        action: hideAlert
-                    )
-                )
-            }
+            .audioTooLongAlert(isPresented: $audioTooLong)
         }
     }
 }
