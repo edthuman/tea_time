@@ -43,7 +43,7 @@ class AudioPlayerManager: NSObject, ObservableObject, AVAudioPlayerDelegate {
         audioPlayer?.stop()
         audioPlayer = nil
         
-        if let url = currentPlayingURL {
+        if currentPlayingURL != nil {
             currentPlayingURL = nil
         }
     }
