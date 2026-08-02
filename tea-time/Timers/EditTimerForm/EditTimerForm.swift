@@ -23,7 +23,7 @@ struct EditTimerForm: View {
     @State private var newTimerBackground: Color
     
     @State private var audioURL: URL? = nil
-    @State private var showPicker = false
+    @State private var showAudioPicker = false
     @State private var hasAudioChanged: Bool = false
     @State private var audioTooLong: Bool = false
     
@@ -271,40 +271,11 @@ struct EditTimerForm: View {
                 }
                 .padding(.vertical, 20)
                 
-                if audioURL != nil {
-                    HStack (spacing: 10) {
-                        Text("Preview audio")
-                        
-                        if let audioURL = audioURL {
-                            AudioPlayer(audioURL: audioURL)
-                        }
-                    }
-                    .padding(.bottom, 10)
-                }
-                
-                HStack (spacing: 20) {
-                    Button(
-                        audioURL != nil
-                           ? "Change"
-                           : "Select Audio"
-                    ) {
-                        showPicker = true
-                    }
-                    .sheet(isPresented: $showPicker) {
-                        AudioPicker(
-                            audioURL: $audioURL,
-                            audioTooLong: $audioTooLong,
-                            isChanged: $hasAudioChanged
-                        )
-                    }
-                    
-                    if audioURL != nil {
-                        Button("Remove") {
-                            audioURL = nil
-                            hasAudioChanged = true
-                        }.foregroundStyle(.red)
-                    }
-                }
+                FormAudioPicker(
+                    audioURL: $audioURL,
+                    selectionTooLong: $audioTooLong,
+                    hasChanged: $hasAudioChanged)
+                .padding(.top, 10)
                 .padding(.bottom, 20)
                 
                 FormFinishButtons(save: saveChanges, cancel: resetState)
