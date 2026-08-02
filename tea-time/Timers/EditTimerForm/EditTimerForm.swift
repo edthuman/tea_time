@@ -310,17 +310,7 @@ struct EditTimerForm: View {
                 }
                 .padding(.bottom, 20)
                 
-                HStack {
-                    Button("Cancel") {
-                        resetState()
-                    }
-                    .foregroundStyle(.red)
-                    .padding(.trailing, 20)
-                    
-                    Button("Confirm") {
-                        saveChanges()
-                    }
-                }
+                FinishButtons(save: saveChanges, cancel: resetState)
                 .padding(.top, 5)
             }
             .frame(
