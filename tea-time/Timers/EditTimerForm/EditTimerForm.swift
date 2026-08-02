@@ -230,14 +230,11 @@ struct EditTimerForm: View {
                     )
                     .padding(.bottom, 10)
                 
-                ColorPicker("Text Colour", selection: $newTextColour)
+                FormColourPicker("Text Colour", colour: $newTextColour)
                     .frame(width: screenWidth * 0.45)
-                    .padding(.top, 5)
-                    .padding(.vertical, 10)
                 
-                ColorPicker("Background Colour", selection: $newTimerBackground)
+                FormColourPicker("Background Colour", colour: $newTimerBackground)
                     .frame(width: screenWidth * 0.45)
-                    .padding(.top, 10)
                 
                 HStack (spacing: 20) {
                     Button {

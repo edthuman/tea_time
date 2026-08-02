@@ -166,14 +166,11 @@ struct EditFolderForm: View {
                         in: RoundedRectangle(cornerRadius: 12)
                     )
                 
-                ColorPicker("Text Colour", selection: $newTextColour)
+                FormColourPicker("Text Colour", colour: $newTextColour)
                     .frame(width: screenWidth * 0.45)
-                    .padding(.top, 5)
-                    .padding(.vertical, 10)
                 
-                ColorPicker("Background Colour", selection: $newFolderBackground)
+                FormColourPicker("Background Colour", colour: $newFolderBackground)
                     .frame(width: screenWidth * 0.45)
-                    .padding(.vertical, 10)
                 
                 if audioURL != nil {
                     HStack (spacing: 10) {
