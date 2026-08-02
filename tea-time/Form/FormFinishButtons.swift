@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct FinishButtons: View {
+struct FormFinishButtons: View {
     @State var save: () -> Void
     @State var cancel: () -> Void
     

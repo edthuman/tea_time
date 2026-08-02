@@ -211,7 +211,7 @@ struct EditFolderForm: View {
                 }
                 .padding(.bottom, 20)
                 
-                FinishButtons(save: saveChanges, cancel: resetState)
+                FormFinishButtons(save: saveChanges, cancel: resetState)
                 .padding(.top, 5)
             }
             .frame(
