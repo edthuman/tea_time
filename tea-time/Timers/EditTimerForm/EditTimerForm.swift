@@ -218,17 +218,13 @@ struct EditTimerForm: View {
             .padding(.trailing, 17)
 
             VStack {
-                TextField("Name", text: $newTimerName)
-                    .frame(maxWidth: screenWidth * 0.3)
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(newTextColour)
-                    .fontWeight(.bold)
-                    .padding(20)
-                    .background(
-                        newTimerBackground,
-                        in: RoundedRectangle(cornerRadius: 12)
-                    )
-                    .padding(.bottom, 10)
+                FormButtonName(
+                    name: $newTimerName,
+                    textColour: newTextColour,
+                    backgroundColour: newTimerBackground
+                )
+                .frame(maxWidth: screenWidth * 0.39)
+                .padding(.bottom, 10)
                 
                 FormColourPicker("Text Colour", colour: $newTextColour)
                     .frame(width: screenWidth * 0.45)
