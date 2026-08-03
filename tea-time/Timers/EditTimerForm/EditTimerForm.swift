@@ -173,15 +173,7 @@ struct EditTimerForm: View {
             let screenWidth = geometry.size.width
             let screenHeight = geometry.size.height
             
-            HStack {
-                Button(action: resetState) {
-                    Image(systemName: "xmark")
-                        .foregroundStyle(.gray)
-                }
-                .frame(maxWidth: .infinity, alignment: .trailing)
-            }
-            .padding(.top, 17)
-            .padding(.trailing, 17)
+            CloseButton(close: resetState)
 
             VStack {
                 FormButtonName(
