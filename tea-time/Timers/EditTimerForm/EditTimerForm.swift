@@ -107,41 +107,7 @@ struct EditTimerForm: View {
             }
         }
     }
-    
-    private func incrementTimeLength() {
-        let currentValue = Int(newTimerLength) ?? 0
-        newTimerLength = "\(currentValue + 1)"
-    }
-    
-    private func decrementTimeLength() {
-        let currentValue = Int(newTimerLength) ?? 0
         
-        if currentValue > 0 {
-            newTimerLength = "\(currentValue - 1)"
-        }
-    }
-    
-    private func getNewTimerLength(_ timerLength: String) -> String {
-        let filtered = timerLength.filter { "0123456789".contains($0) }
-        if filtered.isEmpty {
-            return "0"
-        }
-        
-        // Removed leading zeroes
-        let zeroesRemoved = Int(filtered) ?? 0
-
-        let isTooHigh = zeroesRemoved > 1_000_000
-        if isTooHigh {
-            return "1000000"
-        }
-        
-        let isTooLow = zeroesRemoved < 0
-        if isTooLow {
-            return "0"
-        }
-        return String(zeroesRemoved)
-    }
-    
     private mutating func intialiseTimerFileURL() {
         let timer = appState.timerBeingEdited
         
@@ -233,28 +199,7 @@ struct EditTimerForm: View {
                     .frame(width: screenWidth * 0.45)
                 
                 HStack (spacing: 20) {
-                    Button {
-                        decrementTimeLength()
-                    } label: {
-                        Text("-")
-                    }
-                    
-                    TextField("0", text: $newTimerLength)
-                        .onChange(of: newTimerLength) { oldValue, input in
-                            newTimerLength = getNewTimerLength(input)
-                        }
-                      .multilineTextAlignment(.center)
-                      .keyboardType(.numberPad)
-                      .padding(.leading, 1)
-                      .padding(.trailing, 1)
-                      .frame(minWidth: 30, idealWidth: nil, maxWidth: nil)
-                      .fixedSize()
-                    
-                    Button {
-                        incrementTimeLength()
-                    } label: {
-                        Text("+")
-                    }
+                    FormNumber(value: $newTimerLength)
                     
                     Picker("", selection: $selectedTimePeriod) {
                         Text(newTimerLength == "1" ? "second" : "seconds")
