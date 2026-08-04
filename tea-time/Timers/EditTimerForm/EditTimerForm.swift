@@ -21,9 +21,9 @@ struct EditTimerForm: View {
     @State private var selectedTimePeriod: TimePeriods
     @State private var newTextColour: Color
     @State private var newTimerBackground: Color
-    @State private var showPicker = false
-
+    
     @State private var audioURL: URL? = nil
+    @State private var showAudioPicker = false
     @State private var hasAudioChanged: Bool = false
     @State private var audioTooLong: Bool = false
     
@@ -96,7 +96,7 @@ struct EditTimerForm: View {
                 try viewContext.save()
 
                 let fileName = getFileNameForTimer(timer: timer)
-                saveNotificationSound(fileURL: audioURL, fileName: fileName)
+                saveNotificationSound(fileURL: audioURL, fileName: fileName, hasAudioChanged: hasAudioChanged)
 
                 resetState()
             } catch {
@@ -107,74 +107,7 @@ struct EditTimerForm: View {
             }
         }
     }
-    
-    private func saveNotificationSound(fileURL: URL?, fileName: String) {
-        if hasAudioChanged == false {
-            // Prevent re-saving of audio from bookmark when the file is not changed
-            return
-        }
         
-        do {
-            let soundFileURL: URL = try getSoundFileURL(fileName: fileName)
-                
-            guard let url = fileURL else {
-                // Sound removed from timer
-                try deleteSoundFile(fileName: fileName)
-                return
-            }
-                
-            
-            if fileManager.fileExists(atPath: soundFileURL.path) {
-                _ = try fileManager.replaceItemAt(
-                    soundFileURL,
-                    withItemAt: url
-                )
-            } else {
-                try fileManager.copyItem(
-                    at: url,
-                    to: soundFileURL,
-                )
-            }
-        }
-        catch {
-            printWithNewlineAbove(input: "Failed to create audio file:\n \(error)\n")
-        }
-    }
-    
-    private func incrementTimeLength() {
-        let currentValue = Int(newTimerLength) ?? 0
-        newTimerLength = "\(currentValue + 1)"
-    }
-    
-    private func decrementTimeLength() {
-        let currentValue = Int(newTimerLength) ?? 0
-        
-        if currentValue > 0 {
-            newTimerLength = "\(currentValue - 1)"
-        }
-    }
-    
-    private func getNewTimerLength(_ timerLength: String) -> String {
-        let filtered = timerLength.filter { "0123456789".contains($0) }
-        if filtered.isEmpty {
-            return "0"
-        }
-        
-        // Removed leading zeroes
-        let zeroesRemoved = Int(filtered) ?? 0
-
-        let isTooHigh = zeroesRemoved > 1_000_000
-        if isTooHigh {
-            return "1000000"
-        }
-        
-        let isTooLow = zeroesRemoved < 0
-        if isTooLow {
-            return "0"
-        }
-        return String(zeroesRemoved)
-    }
-    
     private mutating func intialiseTimerFileURL() {
         let timer = appState.timerBeingEdited
         
@@ -240,61 +173,25 @@ struct EditTimerForm: View {
             let screenWidth = geometry.size.width
             let screenHeight = geometry.size.height
             
-            HStack {
-                Button(action: resetState) {
-                    Image(systemName: "xmark")
-                        .foregroundStyle(.gray)
-                }
-                .frame(maxWidth: .infinity, alignment: .trailing)
-            }
-            .padding(.top, 17)
-            .padding(.trailing, 17)
+            CloseButton(close: resetState)
 
             VStack {
-                TextField("Name", text: $newTimerName)
-                    .frame(maxWidth: screenWidth * 0.3)
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(newTextColour)
-                    .fontWeight(.bold)
-                    .padding(20)
-                    .background(
-                        newTimerBackground,
-                        in: RoundedRectangle(cornerRadius: 12)
-                    )
-                    .padding(.bottom, 10)
+                FormButtonName(
+                    name: $newTimerName,
+                    textColour: newTextColour,
+                    backgroundColour: newTimerBackground
+                )
+                .frame(maxWidth: screenWidth * 0.39)
+                .padding(.bottom, 10)
                 
-                ColorPicker("Text Colour", selection: $newTextColour)
+                FormColourPicker("Text Colour", colour: $newTextColour)
                     .frame(width: screenWidth * 0.45)
-                    .padding(.top, 5)
-                    .padding(.vertical, 10)
                 
-                ColorPicker("Background Colour", selection: $newTimerBackground)
+                FormColourPicker("Background Colour", colour: $newTimerBackground)
                     .frame(width: screenWidth * 0.45)
-                    .padding(.top, 10)
                 
                 HStack (spacing: 20) {
-                    Button {
-                        decrementTimeLength()
-                    } label: {
-                        Text("-")
-                    }
-                    
-                    TextField("0", text: $newTimerLength)
-                        .onChange(of: newTimerLength) { oldValue, input in
-                            newTimerLength = getNewTimerLength(input)
-                        }
-                      .multilineTextAlignment(.center)
-                      .keyboardType(.numberPad)
-                      .padding(.leading, 1)
-                      .padding(.trailing, 1)
-                      .frame(minWidth: 30, idealWidth: nil, maxWidth: nil)
-                      .fixedSize()
-                    
-                    Button {
-                        incrementTimeLength()
-                    } label: {
-                        Text("+")
-                    }
+                    FormNumber(value: $newTimerLength)
                     
                     Picker("", selection: $selectedTimePeriod) {
                         Text(newTimerLength == "1" ? "second" : "seconds")
@@ -307,75 +204,21 @@ struct EditTimerForm: View {
                 }
                 .padding(.vertical, 20)
                 
-                if audioURL != nil {
-                    HStack (spacing: 10) {
-                        Text("Preview audio")
-                        
-                        if let audioURL = audioURL {
-                            AudioPlayer(audioURL: audioURL)
-                        }
-                    }
-                    .padding(.bottom, 10)
-                }
-                
-                HStack (spacing: 20) {
-                    Button(
-                        audioURL != nil
-                           ? "Change"
-                           : "Select Audio"
-                    ) {
-                        showPicker = true
-                    }
-                    .sheet(isPresented: $showPicker) {
-                        AudioPicker(
-                            audioURL: $audioURL,
-                            audioTooLong: $audioTooLong,
-                            isChanged: $hasAudioChanged
-                        )
-                    }
-                    
-                    if audioURL != nil {
-                        Button("Remove") {
-                            audioURL = nil
-                            hasAudioChanged = true
-                        }.foregroundStyle(.red)
-                    }
-                }
+                FormAudioPicker(
+                    audioURL: $audioURL,
+                    selectionTooLong: $audioTooLong,
+                    hasChanged: $hasAudioChanged)
+                .padding(.top, 10)
                 .padding(.bottom, 20)
                 
-                HStack {
-                    Button("Cancel") {
-                        resetState()
-                    }
-                    .foregroundStyle(.red)
-                    .padding(.trailing, 20)
-                    
-                    Button("Confirm") {
-                        saveChanges()
-                    }
-                }
+                FormFinishButtons(save: saveChanges, cancel: resetState)
                 .padding(.top, 5)
             }
             .frame(
                 width: screenWidth,
                 height: screenHeight * 0.95
             )
-            .alert(isPresented: $audioTooLong) {
-                func hideAlert() {
-                    audioTooLong = false
-                }
-                
-                return Alert(
-                    title: Text("Selected audio was too long"),
-                    message: Text(
-                        "Notification sounds cannot be longer than 30 seconds"
-                    ),
-                    dismissButton: .default(
-                        Text("But I liked that audio... 😞"),
-                        action: hideAlert
-                    )
-                )
-            }
+            .audioTooLongAlert(isPresented: $audioTooLong)
         }
     }
 }

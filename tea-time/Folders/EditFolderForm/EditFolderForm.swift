@@ -12,6 +12,11 @@ struct EditFolderForm: View {
     @State private var newTextColour: Color
     @State private var newFolderBackground: Color
     
+    @State private var audioURL: URL? = nil
+    @State private var showAudioPicker = false
+    @State private var hasAudioChanged: Bool = false
+    @State private var audioTooLong: Bool = false
+    
     private func resetState() {
         newFolderName = ""
         newTextColour = .white
@@ -19,11 +24,36 @@ struct EditFolderForm: View {
         isAdding.toggle()
         appState.setFolderBeingEdited(nil)
         isPresented = false
+        hasAudioChanged = false
+        audioURL = nil
+    }
+    
+    private mutating func intialiseFolderFileURL() {
+        let fileManager = FileManager.default
+
+        guard let folder = appState.folderBeingEdited else {
+            return
+        }
+        
+        do {
+            let fileName = getFileNameForFolder(folder: folder)
+            let url: URL = try getSoundFileURL(fileName: fileName)
+            
+            if fileManager.fileExists(atPath: url.path) {
+                _audioURL = State(initialValue: url)
+            } else {
+                _audioURL = State(initialValue: nil)
+            }
+        }
+        catch {
+            printWithNewlineAbove(input: "Error initialising sound file URL")
+            _audioURL = State(initialValue: nil)
+        }
     }
     
     private func saveChanges () {
         withAnimation {
-            let folder: Folder? = appState.folderBeingEdited
+            var folder: Folder? = appState.folderBeingEdited
   
             let folderName = newFolderName
             
@@ -60,37 +90,17 @@ struct EditFolderForm: View {
                 newItem.bgRed = bgRed
                 newItem.bgGreen = bgGreen
                 newItem.bgBlue = bgBlue
+                folder = newItem
             }
             
             do {
                 try viewContext.save()
-                resetState()
-            } catch {
-                // EDTODO - Replace this implementation with code to handle the error appropriately.
-                // fatalError terminates the app and creates a crash log
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
-        }
-    }
-    
-    private func addFolder () {
-        withAnimation {
-            let newItem = Folder(context: viewContext)
-            newItem.folderName = newFolderName
-            
-            let textColor = UIColor(newTextColour).cgColor.components
-            newItem.textRed = Double(textColor?[0] ?? 0)
-            newItem.textGreen = Double(textColor?[1] ?? 0)
-            newItem.textBlue = Double(textColor?[2] ?? 0)
-            
-            let bgColor = UIColor(newFolderBackground).cgColor.components
-            newItem.bgRed = Double(bgColor?[0] ?? 0)
-            newItem.bgGreen = Double(bgColor?[1] ?? 0)
-            newItem.bgBlue = Double(bgColor?[2] ?? 0)
-            
-            do {
-                try viewContext.save()
+                
+                if let folder = folder {
+                    let fileName = getFileNameForFolder(folder: folder)
+                    saveNotificationSound(fileURL: audioURL, fileName: fileName, hasAudioChanged: hasAudioChanged)
+                }
+                
                 resetState()
             } catch {
                 // EDTODO - Replace this implementation with code to handle the error appropriately.
@@ -107,9 +117,22 @@ struct EditFolderForm: View {
         _isAdding = State(initialValue: folder == nil)
         _newFolderName = State(initialValue: folder?.folderName ?? "")
         
-        if folder != nil {
-            _newTextColour = State(initialValue: Color(red: folder!.textRed, green: folder!.textGreen, blue: folder!.textBlue))
-            _newFolderBackground = State(initialValue: Color(red: folder!.bgRed, green: folder!.bgGreen, blue: folder!.bgBlue))
+        if let folder = folder {
+            _newTextColour = State(
+                initialValue: Color(
+                    red: folder.textRed,
+                    green: folder.textGreen,
+                    blue: folder.textBlue
+                )
+            )
+            _newFolderBackground = State(
+                initialValue: Color(
+                    red: folder.bgRed,
+                    green: folder.bgGreen,
+                    blue: folder.bgBlue
+                )
+            )
+            intialiseFolderFileURL()
         } else {
             _newTextColour = State(initialValue: .white)
             _newFolderBackground = State(initialValue: .placeholderBackground)
@@ -121,54 +144,38 @@ struct EditFolderForm: View {
             let screenWidth = geometry.size.width
             let screenHeight = geometry.size.height
             
-            HStack {
-                Button(action: resetState) {
-                    Image(systemName: "xmark")
-                        .foregroundStyle(.gray)
-                }
-                .frame(maxWidth: .infinity, alignment: .trailing)
-            }
-            .padding(.top, 17)
-            .padding(.trailing, 17)
+            CloseButton(close: resetState)
 
             VStack {
-                TextField("Name", text: $newFolderName)
-                    .frame(maxWidth: screenWidth * 0.3)
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(newTextColour)
-                    .fontWeight(.bold)
-                    .padding(20)
-                    .background(
-                        newFolderBackground,
-                        in: RoundedRectangle(cornerRadius: 12)
-                    )
+                FormButtonName(
+                    name: $newFolderName,
+                    textColour: newTextColour,
+                    backgroundColour: newFolderBackground
+                )
+                .frame(maxWidth: screenWidth * 0.39)
+                .padding(.bottom, 10)
                 
-                ColorPicker("Text Colour", selection: $newTextColour)
+                FormColourPicker("Text Colour", colour: $newTextColour)
                     .frame(width: screenWidth * 0.45)
-                    .padding(.top, 5)
-                    .padding(.vertical, 10)
                 
-                ColorPicker("Background Colour", selection: $newFolderBackground)
+                FormColourPicker("Background Colour", colour: $newFolderBackground)
                     .frame(width: screenWidth * 0.45)
-                    .padding(.vertical, 10)
                 
-                HStack {
-                    Button(action: resetState) {
-                        Text("Cancel")
-                            .foregroundStyle(.red)
-                    }
-                    .padding(.trailing, 20)
-                    
-                    Button(action: saveChanges) {
-                        Text("Confirm")
-                    }
-                }
+                FormAudioPicker(
+                    audioURL: $audioURL,
+                    selectionTooLong: $audioTooLong,
+                    hasChanged: $hasAudioChanged)
+                .padding(.top, 10)
+                .padding(.bottom, 20)
+                
+                FormFinishButtons(save: saveChanges, cancel: resetState)
                 .padding(.top, 5)
             }
             .frame(
                 width: screenWidth,
                 height: screenHeight * 0.95
             )
+            .audioTooLongAlert(isPresented: $audioTooLong)
         }
     }
 }

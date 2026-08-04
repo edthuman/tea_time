@@ -54,18 +54,13 @@ func createNotification(title: String, description: String, playSound: Bool, tim
     content.title = title
     content.body = description
     
-    if (playSound && timer.folder?.folderName == "Mary") {
-        // add default sound to notification config
-        let soundName = UNNotificationSoundName(rawValue: "_mary.wav")
-        content.sound = UNNotificationSound(named: soundName)
-    } else if (playSound && timer.folder?.folderName == "Ed") {
-        let soundName = UNNotificationSoundName(rawValue: "_ed.wav")
-        content.sound = UNNotificationSound(named: soundName)
-    } else if (playSound) {
-        let soundName = UNNotificationSoundName(
-            rawValue: timer.objectID.uriRepresentation().lastPathComponent
+    if (playSound) {
+        let soundName: String = getTimerSoundName(timer: timer)
+        let notifcationSoundName = UNNotificationSoundName(
+            rawValue: soundName
         )
-        content.sound = UNNotificationSound(named: soundName)
+        
+        content.sound = UNNotificationSound(named: notifcationSoundName)
     }
     
     if (timeDelay != nil) {
@@ -80,42 +75,21 @@ func createNotification(title: String, description: String, playSound: Bool, tim
     return request
 }
 
-func getFileNameForTimer (timer: Timer) -> String {
-    return timer.objectID.uriRepresentation().lastPathComponent
-}
-
-func getSoundsDirectoryURL() throws -> URL {
-    let fileManager = FileManager.default
-    
-    let soundsDirectoryURL = fileManager.urls(
-        for: .libraryDirectory,
-        in: .userDomainMask
-    )
-    .first!
-    .appendingPathComponent("Sounds")
-    
-    try fileManager.createDirectory(
-        at: soundsDirectoryURL,
-        withIntermediateDirectories: true,
-        attributes: nil
-    )
-    return soundsDirectoryURL
-}
-
-func getSoundFileURL(fileName: String) throws -> URL {
-    let soundsDirectoryURL = try getSoundsDirectoryURL()
-
-    let soundFileURL = soundsDirectoryURL
-        .appendingPathComponent(fileName)
-    return soundFileURL
-}
-
-func deleteSoundFile(fileName: String) throws {
-    let fileManager = FileManager.default
-    
-    let soundFileURL = try getSoundFileURL(fileName: fileName)
-    
-    if fileManager.fileExists(atPath: soundFileURL.path()) {
-        try fileManager.removeItem(at: soundFileURL)
+func getTimerSoundName(timer: Timer) -> String {
+    let timerFileName = getFileNameForTimer(timer: timer)
+    let timerSoundExists = checkFileExists(fileName: timerFileName)
+    if (timerSoundExists) {
+        return timerFileName
     }
+    
+    let folder = timer.folder
+    if let folder = folder {
+        let folderFileName = getFileNameForFolder(folder: folder)
+        let folderSoundExists = checkFileExists(fileName: folderFileName)
+        if (folderSoundExists) {
+            return folderFileName
+        }
+    }
+
+    return timerFileName
 }
