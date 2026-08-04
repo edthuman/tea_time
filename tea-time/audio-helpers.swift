@@ -11,12 +11,15 @@ func getFileNameForFolder (folder: Folder) -> String {
 }
 
 func getSoundsDirectoryURL() throws -> URL {
-    let soundsDirectoryURL = fileManager.urls(
+    let librayURLs = fileManager.urls(
         for: .libraryDirectory,
         in: .userDomainMask
     )
-    .first!
-    .appendingPathComponent("Sounds")
+
+    guard let libraryURL = librayURLs.first else {
+        throw FileDirectoryErrors.libraryDirectoryNotFound
+    }
+    let soundsDirectoryURL: URL = libraryURL.appendingPathComponent("Sounds")
 
     try fileManager.createDirectory(
         at: soundsDirectoryURL,
