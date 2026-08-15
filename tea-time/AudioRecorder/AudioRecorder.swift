@@ -27,6 +27,7 @@ class AudioRecorder {
             )
             
             engine.reset()
+            engine.inputNode.removeTap(onBus: 0)
             engine.inputNode.installTap(
                 onBus: 0,
                 bufferSize: 4096,
