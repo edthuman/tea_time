@@ -168,8 +168,6 @@ struct EditFolderForm: View {
                 .padding(.top, 10)
                 .padding(.bottom, 20)
                 
-                AudioRecorder()
-                
                 FormFinishButtons(save: saveChanges, cancel: resetState)
                 .padding(.top, 5)
             }
