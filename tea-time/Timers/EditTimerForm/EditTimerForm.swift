@@ -110,25 +110,8 @@ struct EditTimerForm: View {
         
     private mutating func intialiseTimerFileURL() {
         let timer = appState.timerBeingEdited
-        
-        guard let timer = timer else {
-            return
-        }
-        
-        do {
-            let fileName = getFileName(timer)
-            let url: URL = try getSoundFileURL(fileName: fileName)
-            
-            if fileManager.fileExists(atPath: url.path) {
-                _audioURL = State(initialValue: url)
-            } else {
-                _audioURL = State(initialValue: nil)
-            }
-        }
-        catch {
-            printWithNewlineAbove(input: "Error initialising sound file URL")
-            _audioURL = State(initialValue: nil)
-        }
+        let fileURL = getItemSoundURL(timer)
+        _audioURL = State(initialValue: fileURL)
     }
     
     init(isPresented: Binding<Bool>) {

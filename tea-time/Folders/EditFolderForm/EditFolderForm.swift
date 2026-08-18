@@ -29,26 +29,9 @@ struct EditFolderForm: View {
     }
     
     private mutating func intialiseFolderFileURL() {
-        let fileManager = FileManager.default
-
-        guard let folder = appState.folderBeingEdited else {
-            return
-        }
-        
-        do {
-            let fileName = getFileName(folder)
-            let url: URL = try getSoundFileURL(fileName: fileName)
-            
-            if fileManager.fileExists(atPath: url.path) {
-                _audioURL = State(initialValue: url)
-            } else {
-                _audioURL = State(initialValue: nil)
-            }
-        }
-        catch {
-            printWithNewlineAbove(input: "Error initialising sound file URL")
-            _audioURL = State(initialValue: nil)
-        }
+        let folder = appState.folderBeingEdited
+        let fileURL = getItemSoundURL(folder)
+        _audioURL = State(initialValue: fileURL)
     }
     
     private func saveChanges () {

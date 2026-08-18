@@ -3,7 +3,7 @@ import SwiftUI
 
 private let fileManager = FileManager.default
 
-func getFileName (_ item: NSManagedObject) -> String {
+func getFileName(_ item: NSManagedObject) -> String {
     return item.objectID.uriRepresentation().lastPathComponent
 }
 
@@ -26,6 +26,27 @@ func getSoundsDirectoryURL() throws -> URL {
     return soundsDirectoryURL
 }
 
+/// Returns the URL for a sound saved to a given object, or nil if none can be found
+func getItemSoundURL(_ item: NSManagedObject?) -> URL? {
+    guard let item = item else {
+        return nil
+    }
+    
+    do {
+        let fileName = getFileName(item)
+        let url: URL = try getSoundFileURL(fileName: fileName)
+        
+        if fileManager.fileExists(atPath: url.path) {
+            return url
+        }
+    }
+    catch {
+        printWithNewlineAbove(input: "Error initialising sound file URL")
+    }
+    return nil
+}
+
+/// Returns the full URL for a given sound file from its name
 func getSoundFileURL(fileName: String) throws -> URL {
     let soundsDirectoryURL = try getSoundsDirectoryURL()
 
