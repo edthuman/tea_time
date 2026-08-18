@@ -95,7 +95,7 @@ struct EditTimerForm: View {
             do {
                 try viewContext.save()
 
-                let fileName = getFileNameForTimer(timer: timer)
+                let fileName = getFileName(timer)
                 saveNotificationSound(fileURL: audioURL, fileName: fileName, hasAudioChanged: hasAudioChanged)
 
                 resetState()
@@ -116,7 +116,7 @@ struct EditTimerForm: View {
         }
         
         do {
-            let fileName = getFileNameForTimer(timer: timer)
+            let fileName = getFileName(timer)
             let url: URL = try getSoundFileURL(fileName: fileName)
             
             if fileManager.fileExists(atPath: url.path) {

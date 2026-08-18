@@ -85,7 +85,7 @@ struct Timers: View {
                 
                 func deleteTimer() {
                     if let timer = timer {
-                        let fileName = getFileNameForTimer(timer: timer)
+                        let fileName = getFileName(timer)
                         viewContext.delete(timer)
                         
                         do {

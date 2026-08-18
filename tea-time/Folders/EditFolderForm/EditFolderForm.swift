@@ -36,7 +36,7 @@ struct EditFolderForm: View {
         }
         
         do {
-            let fileName = getFileNameForFolder(folder: folder)
+            let fileName = getFileName(folder)
             let url: URL = try getSoundFileURL(fileName: fileName)
             
             if fileManager.fileExists(atPath: url.path) {
@@ -97,7 +97,7 @@ struct EditFolderForm: View {
                 try viewContext.save()
                 
                 if let folder = folder {
-                    let fileName = getFileNameForFolder(folder: folder)
+                    let fileName = getFileName(folder)
                     saveNotificationSound(fileURL: audioURL, fileName: fileName, hasAudioChanged: hasAudioChanged)
                 }
                 

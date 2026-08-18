@@ -1,13 +1,10 @@
+import CoreData
 import SwiftUI
 
 private let fileManager = FileManager.default
 
-func getFileNameForTimer (timer: Timer) -> String {
-    return timer.objectID.uriRepresentation().lastPathComponent
-}
-
-func getFileNameForFolder (folder: Folder) -> String {
-    return folder.objectID.uriRepresentation().lastPathComponent
+func getFileName (_ item: NSManagedObject) -> String {
+    return item.objectID.uriRepresentation().lastPathComponent
 }
 
 func getSoundsDirectoryURL() throws -> URL {

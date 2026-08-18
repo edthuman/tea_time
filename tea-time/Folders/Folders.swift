@@ -61,7 +61,7 @@ struct Folders: View {
                     do {
                         if let timers = folder.timers as? Set<Timer> {
                             for timer in timers {
-                                let soundFileName = getFileNameForTimer(timer: timer)
+                                let soundFileName = getFileName(timer)
                                 try deleteSoundFile(fileName: soundFileName)
                             }
                         }
