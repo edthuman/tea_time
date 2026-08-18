@@ -166,7 +166,7 @@ struct EditFolderForm: View {
                     selectionTooLong: $audioTooLong,
                     hasChanged: $hasAudioChanged)
                 .padding(.top, 10)
-                .padding(.bottom, 20)
+                .padding(.bottom, 8)
                 
                 FormFinishButtons(save: saveChanges, cancel: resetState)
                 .padding(.top, 5)

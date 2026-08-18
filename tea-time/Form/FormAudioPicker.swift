@@ -77,9 +77,7 @@ struct FormAudioPicker: View {
                 Image(
                     systemName: recorder.status == RecorderStatus.recording ? "mic.fill" : "mic"
                 )
-                .font(.system(
-                    size: 16, weight: .semibold
-                ))
+                .font(.system(size: 16))
                 .foregroundStyle(
                     recorder.status == RecorderStatus.recording ? .red : .dynamicBlack
                 )

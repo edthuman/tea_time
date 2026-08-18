@@ -202,14 +202,13 @@ struct EditTimerForm: View {
                             .tag(TimePeriods.hours)
                     }.fixedSize()
                 }
-                .padding(.vertical, 20)
+                .padding(.vertical, 10)
                 
                 FormAudioPicker(
                     audioURL: $audioURL,
                     selectionTooLong: $audioTooLong,
                     hasChanged: $hasAudioChanged)
-                .padding(.top, 10)
-                .padding(.bottom, 20)
+                .padding(.vertical, 12)
                 
                 FormFinishButtons(save: saveChanges, cancel: resetState)
                 .padding(.top, 5)
