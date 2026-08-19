@@ -55,6 +55,10 @@ func getSoundFileURL(fileName: String) throws -> URL {
     return soundFileURL
 }
 
+/// Recordings are saved to the temporary directory - getting saved to the library directory if the user saves the item
+func getRecordingURL() -> URL { fileManager.temporaryDirectory.appendingPathComponent("latest_recording.caf")
+}
+
 func deleteSoundFile(fileName: String) throws {
     let soundFileURL = try getSoundFileURL(fileName: fileName)
 

@@ -1,4 +1,5 @@
 enum FileDirectoryErrors: Error {
-    case libraryDirectoryNotFound
     case documentDirectoryNotFound
+    case libraryDirectoryNotFound
+    case temporaryDirectoryNotFound
 }

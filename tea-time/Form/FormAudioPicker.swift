@@ -1,20 +1,5 @@
 import SwiftUI
 
-func getTestSoundFileURL() throws -> URL {
-    let fileManager = FileManager.default
-    let documentDirectoryURLs = fileManager.urls(
-        for: .documentDirectory,
-        in: .userDomainMask
-    )
-
-    guard let documentDirectoryURL = documentDirectoryURLs.first else {
-        throw FileDirectoryErrors.documentDirectoryNotFound
-    }
-    let testFile: URL = documentDirectoryURL.appendingPathComponent("test-file.m4a")
-
-    return testFile
-}
-
 struct FormAudioPicker: View {
     @State private var recorder = AudioRecorder()
     @Binding var audioURL: URL?
@@ -22,6 +7,8 @@ struct FormAudioPicker: View {
     @Binding var hasChanged: Bool
     
     @State private var isPresented: Bool = false
+    
+    let recordingURL: URL = getRecordingURL()
     
     var body: some View {
         VStack (spacing: 10) {
@@ -64,14 +51,12 @@ struct FormAudioPicker: View {
                 }
             }
             .padding(.bottom, 10)
-            
-            let soundFileURL: URL = try! getTestSoundFileURL()
-                            
+
             Button {
                 if (recorder.status == .recording) {
                     recorder.stopRecording()
                 } else {
-                    recorder.startRecording(outputURL: soundFileURL)
+                    recorder.startRecording(outputURL: recordingURL)
                 }
             } label: {
                 Image(
@@ -91,6 +76,12 @@ struct FormAudioPicker: View {
             .disabled(
                 recorder.status == RecorderStatus.transitioning
             )
+        }
+        .onChange(of: recorder.status ) { oldStatus, newStatus in
+            if oldStatus == .recording && newStatus == .idle {
+                audioURL = recordingURL
+                hasChanged = true
+            }
         }
     }
 }

@@ -147,7 +147,8 @@ struct EditFolderForm: View {
                 FormAudioPicker(
                     audioURL: $audioURL,
                     selectionTooLong: $audioTooLong,
-                    hasChanged: $hasAudioChanged)
+                    hasChanged: $hasAudioChanged
+                )
                 .padding(.top, 10)
                 .padding(.bottom, 8)
                 
