@@ -29,6 +29,9 @@ struct EditTimerForm: View {
     @State private var audioTooLong: Bool = false
     
     private func resetState() {
+        if recorder.status == .recording {
+            recorder.stopRecording()
+        }
         newTimerName = ""
         newTimerLength = "1"
         selectedTimePeriod = .minutes
@@ -208,6 +211,11 @@ struct EditTimerForm: View {
                 height: screenHeight * 0.95
             )
             .audioTooLongAlert(isPresented: $audioTooLong)
+        }
+        .onDisappear {
+            if recorder.status == .recording {
+                recorder.stopRecording()
+            }
         }
     }
 }

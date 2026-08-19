@@ -19,6 +19,9 @@ struct EditFolderForm: View {
     @State private var audioTooLong: Bool = false
     
     private func resetState() {
+        if recorder.status == .recording {
+            recorder.stopRecording()
+        }
         newFolderName = ""
         newTextColour = .white
         newFolderBackground = .placeholderBackground
@@ -166,6 +169,11 @@ struct EditFolderForm: View {
                 height: screenHeight * 0.95
             )
             .audioTooLongAlert(isPresented: $audioTooLong)
+        }
+        .onDisappear {
+            if recorder.status == RecorderStatus.recording {
+                recorder.stopRecording()
+            }
         }
     }
 }
