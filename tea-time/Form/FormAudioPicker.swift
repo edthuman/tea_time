@@ -8,7 +8,6 @@ struct FormAudioPicker: View {
     @State private var isPresented: Bool = false
     
     var recorder: AudioRecorder
-    
     let recordingURL: URL = getRecordingURL()
     
     var body: some View {

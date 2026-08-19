@@ -81,7 +81,6 @@ func saveNotificationSound(fileURL: URL?, fileName: String, hasAudioChanged: Boo
             try deleteSoundFile(fileName: fileName)
             return
         }
-            
         
         if fileManager.fileExists(atPath: soundFileURL.path) {
             _ = try fileManager.replaceItemAt(
@@ -121,7 +120,6 @@ func clearTemporaryDirectory() {
     catch {
         printWithNewlineAbove(input: "Failed to fetch temporary files: \(error)")
     }
-    
     
     for file in temporaryFiles {
         do {
