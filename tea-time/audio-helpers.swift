@@ -112,3 +112,23 @@ func checkFileExists(fileName: String) -> Bool {
         return false
     }
 }
+
+func clearTemporaryDirectory() {
+    var temporaryFiles: [URL] = []
+    do {
+        temporaryFiles = try fileManager.contentsOfDirectory(at: fileManager.temporaryDirectory, includingPropertiesForKeys: nil)
+    }
+    catch {
+        printWithNewlineAbove(input: "Failed to fetch temporary files: \(error)")
+    }
+    
+    
+    for file in temporaryFiles {
+        do {
+            try fileManager.removeItem(at: file)
+        }
+        catch {
+            printWithNewlineAbove(input: "Failed to remove temporary file \(file): \(error)")
+        }
+    }
+}

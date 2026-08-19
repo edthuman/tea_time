@@ -8,8 +8,6 @@ enum TimePeriods {
 }
 
 struct EditTimerForm: View {
-    private let fileManager = FileManager.default
-    
     @ObservedObject var state = appState
     @Environment(\.managedObjectContext) private var viewContext
     
@@ -32,6 +30,8 @@ struct EditTimerForm: View {
         if recorder.status == .recording {
             recorder.stopRecording()
         }
+        clearTemporaryDirectory()
+        
         newTimerName = ""
         newTimerLength = "1"
         selectedTimePeriod = .minutes
@@ -216,6 +216,8 @@ struct EditTimerForm: View {
             if recorder.status == .recording {
                 recorder.stopRecording()
             }
+            
+            clearTemporaryDirectory()
         }
     }
 }

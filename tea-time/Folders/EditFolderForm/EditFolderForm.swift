@@ -22,6 +22,8 @@ struct EditFolderForm: View {
         if recorder.status == .recording {
             recorder.stopRecording()
         }
+        clearTemporaryDirectory()
+
         newFolderName = ""
         newTextColour = .white
         newFolderBackground = .placeholderBackground
@@ -174,6 +176,7 @@ struct EditFolderForm: View {
             if recorder.status == RecorderStatus.recording {
                 recorder.stopRecording()
             }
+            clearTemporaryDirectory()
         }
     }
 }
