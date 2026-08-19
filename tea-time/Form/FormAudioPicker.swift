@@ -1,12 +1,13 @@
 import SwiftUI
 
 struct FormAudioPicker: View {
-    @State private var recorder = AudioRecorder()
     @Binding var audioURL: URL?
     @Binding var selectionTooLong: Bool
     @Binding var hasChanged: Bool
     
     @State private var isPresented: Bool = false
+    
+    var recorder: AudioRecorder
     
     let recordingURL: URL = getRecordingURL()
     

@@ -23,6 +23,7 @@ struct EditTimerForm: View {
     @State private var newTimerBackground: Color
     
     @State private var audioURL: URL? = nil
+    @State private var recorder = AudioRecorder()
     @State private var showAudioPicker = false
     @State private var hasAudioChanged: Bool = false
     @State private var audioTooLong: Bool = false
@@ -190,10 +191,16 @@ struct EditTimerForm: View {
                 FormAudioPicker(
                     audioURL: $audioURL,
                     selectionTooLong: $audioTooLong,
-                    hasChanged: $hasAudioChanged)
+                    hasChanged: $hasAudioChanged,
+                    recorder: recorder,
+                )
                 .padding(.vertical, 12)
                 
-                FormFinishButtons(save: saveChanges, cancel: resetState)
+                FormFinishButtons(
+                    save: saveChanges,
+                    disableSave: recorder.status != RecorderStatus.idle,
+                    cancel: resetState
+                )
                 .padding(.top, 5)
             }
             .frame(

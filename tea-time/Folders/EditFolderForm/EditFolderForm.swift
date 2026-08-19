@@ -13,6 +13,7 @@ struct EditFolderForm: View {
     @State private var newFolderBackground: Color
     
     @State private var audioURL: URL? = nil
+    @State private var recorder = AudioRecorder()
     @State private var showAudioPicker = false
     @State private var hasAudioChanged: Bool = false
     @State private var audioTooLong: Bool = false
@@ -147,12 +148,17 @@ struct EditFolderForm: View {
                 FormAudioPicker(
                     audioURL: $audioURL,
                     selectionTooLong: $audioTooLong,
-                    hasChanged: $hasAudioChanged
+                    hasChanged: $hasAudioChanged,
+                    recorder: recorder,
                 )
                 .padding(.top, 10)
                 .padding(.bottom, 8)
                 
-                FormFinishButtons(save: saveChanges, cancel: resetState)
+                FormFinishButtons(
+                    save: saveChanges,
+                    disableSave: recorder.status != RecorderStatus.idle,
+                    cancel: resetState
+                )
                 .padding(.top, 5)
             }
             .frame(
