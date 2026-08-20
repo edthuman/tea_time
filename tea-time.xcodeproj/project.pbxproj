@@ -24,7 +24,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		649BC1DE2E65072000BBA553 /* tea-time.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "tea-time.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		649BC1DE2E65072000BBA553 /* Tea Time.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Tea Time.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		649BC1EB2E65072100BBA553 /* tea-timeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "tea-timeTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		649BC1F52E65072100BBA553 /* tea-timeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "tea-timeUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -73,7 +73,7 @@
 		649BC1DF2E65072000BBA553 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				649BC1DE2E65072000BBA553 /* tea-time.app */,
+				649BC1DE2E65072000BBA553 /* Tea Time.app */,
 				649BC1EB2E65072100BBA553 /* tea-timeTests.xctest */,
 				649BC1F52E65072100BBA553 /* tea-timeUITests.xctest */,
 			);
@@ -83,9 +83,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		649BC1DD2E65072000BBA553 /* tea-time */ = {
+		649BC1DD2E65072000BBA553 /* Tea Time */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 649BC1FF2E65072100BBA553 /* Build configuration list for PBXNativeTarget "tea-time" */;
+			buildConfigurationList = 649BC1FF2E65072100BBA553 /* Build configuration list for PBXNativeTarget "Tea Time" */;
 			buildPhases = (
 				649BC1DA2E65072000BBA553 /* Sources */,
 				649BC1DB2E65072000BBA553 /* Frameworks */,
@@ -98,11 +98,11 @@
 			fileSystemSynchronizedGroups = (
 				649BC1E02E65072000BBA553 /* tea-time */,
 			);
-			name = "tea-time";
+			name = "Tea Time";
 			packageProductDependencies = (
 			);
 			productName = "tea-time";
-			productReference = 649BC1DE2E65072000BBA553 /* tea-time.app */;
+			productReference = 649BC1DE2E65072000BBA553 /* Tea Time.app */;
 			productType = "com.apple.product-type.application";
 		};
 		649BC1EA2E65072100BBA553 /* tea-timeTests */ = {
@@ -182,7 +182,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				649BC1DD2E65072000BBA553 /* tea-time */,
+				649BC1DD2E65072000BBA553 /* Tea Time */,
 				649BC1EA2E65072100BBA553 /* tea-timeTests */,
 				649BC1F42E65072100BBA553 /* tea-timeUITests */,
 			);
@@ -240,12 +240,12 @@
 /* Begin PBXTargetDependency section */
 		649BC1ED2E65072100BBA553 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 649BC1DD2E65072000BBA553 /* tea-time */;
+			target = 649BC1DD2E65072000BBA553 /* Tea Time */;
 			targetProxy = 649BC1EC2E65072100BBA553 /* PBXContainerItemProxy */;
 		};
 		649BC1F72E65072100BBA553 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 649BC1DD2E65072000BBA553 /* tea-time */;
+			target = 649BC1DD2E65072000BBA553 /* Tea Time */;
 			targetProxy = 649BC1F62E65072100BBA553 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -309,6 +309,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "Tea Time WIP";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -366,6 +367,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "Tea Time";
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
@@ -382,7 +384,7 @@
 				DEVELOPMENT_TEAM = UWV8XKK65N;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "${PRODUCT_BUNDLE_IDENTIFIER} wants to record audio to be played when your timers finish";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "To record audio to play when your timers finish";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -411,7 +413,7 @@
 				DEVELOPMENT_TEAM = UWV8XKK65N;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "${PRODUCT_BUNDLE_IDENTIFIER} wants to record audio to be played when your timers finish";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "To record audio to play when your timers finish";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -514,7 +516,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		649BC1FF2E65072100BBA553 /* Build configuration list for PBXNativeTarget "tea-time" */ = {
+		649BC1FF2E65072100BBA553 /* Build configuration list for PBXNativeTarget "Tea Time" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				649BC2002E65072100BBA553 /* Debug */,
