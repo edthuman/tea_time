@@ -13,11 +13,17 @@ struct EditFolderForm: View {
     @State private var newFolderBackground: Color
     
     @State private var audioURL: URL? = nil
+    @State private var recorder = AudioRecorder()
     @State private var showAudioPicker = false
     @State private var hasAudioChanged: Bool = false
     @State private var audioTooLong: Bool = false
     
     private func resetState() {
+        if recorder.status == .recording {
+            recorder.stopRecording()
+        }
+        clearTemporaryDirectory()
+
         newFolderName = ""
         newTextColour = .white
         newFolderBackground = .placeholderBackground
@@ -29,26 +35,9 @@ struct EditFolderForm: View {
     }
     
     private mutating func intialiseFolderFileURL() {
-        let fileManager = FileManager.default
-
-        guard let folder = appState.folderBeingEdited else {
-            return
-        }
-        
-        do {
-            let fileName = getFileNameForFolder(folder: folder)
-            let url: URL = try getSoundFileURL(fileName: fileName)
-            
-            if fileManager.fileExists(atPath: url.path) {
-                _audioURL = State(initialValue: url)
-            } else {
-                _audioURL = State(initialValue: nil)
-            }
-        }
-        catch {
-            printWithNewlineAbove(input: "Error initialising sound file URL")
-            _audioURL = State(initialValue: nil)
-        }
+        let folder = appState.folderBeingEdited
+        let fileURL = getItemSoundURL(folder)
+        _audioURL = State(initialValue: fileURL)
     }
     
     private func saveChanges () {
@@ -97,7 +86,7 @@ struct EditFolderForm: View {
                 try viewContext.save()
                 
                 if let folder = folder {
-                    let fileName = getFileNameForFolder(folder: folder)
+                    let fileName = getFileName(folder)
                     saveNotificationSound(fileURL: audioURL, fileName: fileName, hasAudioChanged: hasAudioChanged)
                 }
                 
@@ -164,11 +153,17 @@ struct EditFolderForm: View {
                 FormAudioPicker(
                     audioURL: $audioURL,
                     selectionTooLong: $audioTooLong,
-                    hasChanged: $hasAudioChanged)
+                    hasChanged: $hasAudioChanged,
+                    recorder: recorder,
+                )
                 .padding(.top, 10)
-                .padding(.bottom, 20)
+                .padding(.bottom, 8)
                 
-                FormFinishButtons(save: saveChanges, cancel: resetState)
+                FormFinishButtons(
+                    save: saveChanges,
+                    disableSave: recorder.status != RecorderStatus.idle,
+                    cancel: resetState
+                )
                 .padding(.top, 5)
             }
             .frame(
@@ -176,6 +171,12 @@ struct EditFolderForm: View {
                 height: screenHeight * 0.95
             )
             .audioTooLongAlert(isPresented: $audioTooLong)
+        }
+        .onDisappear {
+            if recorder.status == RecorderStatus.recording {
+                recorder.stopRecording()
+            }
+            clearTemporaryDirectory()
         }
     }
 }

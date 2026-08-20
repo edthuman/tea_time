@@ -6,11 +6,6 @@ class AudioPlayerManager: NSObject, ObservableObject, AVAudioPlayerDelegate {
     var audioPlayer: AVAudioPlayer?
     private var currentPlayingURL: URL?
     
-    override init() {
-        super.init()
-        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
-    }
-    
     func playAudio(from url: URL) {
         if currentPlayingURL != nil {
             cleanUpAudioResources()

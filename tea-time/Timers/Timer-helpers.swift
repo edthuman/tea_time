@@ -76,7 +76,7 @@ func createNotification(title: String, description: String, playSound: Bool, tim
 }
 
 func getTimerSoundName(timer: Timer) -> String {
-    let timerFileName = getFileNameForTimer(timer: timer)
+    let timerFileName = getFileName(timer)
     let timerSoundExists = checkFileExists(fileName: timerFileName)
     if (timerSoundExists) {
         return timerFileName
@@ -84,7 +84,7 @@ func getTimerSoundName(timer: Timer) -> String {
     
     let folder = timer.folder
     if let folder = folder {
-        let folderFileName = getFileNameForFolder(folder: folder)
+        let folderFileName = getFileName(folder)
         let folderSoundExists = checkFileExists(fileName: folderFileName)
         if (folderSoundExists) {
             return folderFileName

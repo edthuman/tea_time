@@ -8,8 +8,6 @@ enum TimePeriods {
 }
 
 struct EditTimerForm: View {
-    private let fileManager = FileManager.default
-    
     @ObservedObject var state = appState
     @Environment(\.managedObjectContext) private var viewContext
     
@@ -23,11 +21,17 @@ struct EditTimerForm: View {
     @State private var newTimerBackground: Color
     
     @State private var audioURL: URL? = nil
+    @State private var recorder = AudioRecorder()
     @State private var showAudioPicker = false
     @State private var hasAudioChanged: Bool = false
     @State private var audioTooLong: Bool = false
     
     private func resetState() {
+        if recorder.status == .recording {
+            recorder.stopRecording()
+        }
+        clearTemporaryDirectory()
+        
         newTimerName = ""
         newTimerLength = "1"
         selectedTimePeriod = .minutes
@@ -95,7 +99,7 @@ struct EditTimerForm: View {
             do {
                 try viewContext.save()
 
-                let fileName = getFileNameForTimer(timer: timer)
+                let fileName = getFileName(timer)
                 saveNotificationSound(fileURL: audioURL, fileName: fileName, hasAudioChanged: hasAudioChanged)
 
                 resetState()
@@ -110,25 +114,8 @@ struct EditTimerForm: View {
         
     private mutating func intialiseTimerFileURL() {
         let timer = appState.timerBeingEdited
-        
-        guard let timer = timer else {
-            return
-        }
-        
-        do {
-            let fileName = getFileNameForTimer(timer: timer)
-            let url: URL = try getSoundFileURL(fileName: fileName)
-            
-            if fileManager.fileExists(atPath: url.path) {
-                _audioURL = State(initialValue: url)
-            } else {
-                _audioURL = State(initialValue: nil)
-            }
-        }
-        catch {
-            printWithNewlineAbove(input: "Error initialising sound file URL")
-            _audioURL = State(initialValue: nil)
-        }
+        let fileURL = getItemSoundURL(timer)
+        _audioURL = State(initialValue: fileURL)
     }
     
     init(isPresented: Binding<Bool>) {
@@ -202,16 +189,21 @@ struct EditTimerForm: View {
                             .tag(TimePeriods.hours)
                     }.fixedSize()
                 }
-                .padding(.vertical, 20)
+                .padding(.vertical, 10)
                 
                 FormAudioPicker(
                     audioURL: $audioURL,
                     selectionTooLong: $audioTooLong,
-                    hasChanged: $hasAudioChanged)
-                .padding(.top, 10)
-                .padding(.bottom, 20)
+                    hasChanged: $hasAudioChanged,
+                    recorder: recorder,
+                )
+                .padding(.vertical, 12)
                 
-                FormFinishButtons(save: saveChanges, cancel: resetState)
+                FormFinishButtons(
+                    save: saveChanges,
+                    disableSave: recorder.status != RecorderStatus.idle,
+                    cancel: resetState
+                )
                 .padding(.top, 5)
             }
             .frame(
@@ -219,6 +211,13 @@ struct EditTimerForm: View {
                 height: screenHeight * 0.95
             )
             .audioTooLongAlert(isPresented: $audioTooLong)
+        }
+        .onDisappear {
+            if recorder.status == .recording {
+                recorder.stopRecording()
+            }
+            
+            clearTemporaryDirectory()
         }
     }
 }

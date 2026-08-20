@@ -1,8 +1,9 @@
 import SwiftUI
 
 struct FormFinishButtons: View {
-    @State var save: () -> Void
-    @State var cancel: () -> Void
+    let save: () -> Void
+    let disableSave: Bool
+    let cancel: () -> Void
     
     var body: some View {
         HStack {
@@ -15,6 +16,7 @@ struct FormFinishButtons: View {
             Button("Confirm") {
                 save()
             }
+            .disabled(disableSave)
         }
     }
 }
