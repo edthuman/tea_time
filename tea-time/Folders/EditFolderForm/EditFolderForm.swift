@@ -171,6 +171,7 @@ struct EditFolderForm: View {
                 height: screenHeight * 0.95
             )
             .audioTooLongAlert(isPresented: $audioTooLong)
+            .recordingDeniedAlert(isPresented: $recorder.recorderDenied)
         }
         .onDisappear {
             if recorder.status == RecorderStatus.recording {
