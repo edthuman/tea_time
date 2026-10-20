@@ -18,10 +18,18 @@ struct RecordingDeniedAlertModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .alert("Recording permission denied", isPresented: $isPresented) {
-                Button("Understood") { }
+            .alert("Microphone use denied", isPresented: $isPresented) {
+                Button("Change settings", role: .cancel) {
+                    Task {
+                        if let url = URL(string: UIApplication.openSettingsURLString) {
+                            await UIApplication.shared.open(url)
+                        }
+                    }
+                }
+                
+                Button("Cancel recording", role: .destructive) {}
             } message: {
-                Text("To enable recording, go to Settings > Apps > Tea Time")
+                Text("Tea Time requires microphone access to record audio")
             }
     }
 }
