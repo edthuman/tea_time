@@ -10,10 +10,27 @@ class AudioRecorder {
     var framesRecorded: AVAudioFrameCount = 0
     var maximumFrames: AVAudioFrameCount = 0
     
-    func startRecording(outputURL: URL) {
+    func startRecording(outputURL: URL) async {
         status = RecorderStatus.transitioning
         framesRecorded = 0
+        
+        let recordPermission = AVAudioApplication.shared.recordPermission
+        if recordPermission == .denied {
+            // EDTODO: Add updating of state to show warning message
+            status = RecorderStatus.idle
+            return
+        }
+        
         let session = AVAudioSession.sharedInstance()
+        
+        if recordPermission == .undetermined {
+            await AVAudioApplication.requestRecordPermission()
+            if AVAudioApplication.shared.recordPermission != .granted {
+                // EDTODO: Add updating of state to show warning message
+                status = RecorderStatus.idle
+                return
+            }
+        }
         
         do {
         try session.setActive(true)
