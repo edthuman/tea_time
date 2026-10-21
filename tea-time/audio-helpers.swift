@@ -99,7 +99,7 @@ func saveNotificationSound(fileURL: URL?, fileName: String, hasAudioChanged: Boo
     }
 }
 
-func checkFileExists(fileName: String) -> Bool {
+func checkSoundFileExists(fileName: String) -> Bool {
     do {
         let soundFileURL = try getSoundFileURL(fileName: fileName)
         return fileManager.fileExists(atPath: soundFileURL.path)
