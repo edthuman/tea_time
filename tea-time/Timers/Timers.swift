@@ -33,6 +33,10 @@ struct Timers: View {
             sortDescriptors: [NSSortDescriptor(keyPath: \Timer.timerName, ascending: true)],
             predicate: NSPredicate(format: "folder == %@", folderId)
         )
+        
+        if getSavedFolderState(FormType.Timer) != nil {
+            _showEditTimerForm = State(initialValue: true)
+        }
     }
     
     var body: some View {

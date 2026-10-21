@@ -173,6 +173,30 @@ struct EditTimerForm: View {
     }
     
     init(isPresented: Binding<Bool>) {
+        let savedFormState = getSavedFolderState(FormType.Timer)
+        if let savedFormState {
+            self._isPresented = isPresented
+            
+            _isAdding = State(initialValue: savedFormState.isAdding)
+            _audioURL = State(initialValue: savedFormState.audioURL) // EDTODO - verify if this remains correct after audio file handling is done
+            _hasAudioChanged = State(initialValue: savedFormState.hasAudioChanged)
+            
+            _newTimerName = State(initialValue: savedFormState.timerName)
+            _newTimerLength = State(initialValue: savedFormState.timerLength)
+            _selectedTimePeriod = State(initialValue: savedFormState.selectedTimePeriod)
+            _newTextColour = State(initialValue: Color(
+                red: savedFormState.textRed,
+                green: savedFormState.textGreen,
+                blue: savedFormState.textBlue)
+            )
+            _newTimerBackground = State(initialValue: Color(
+                red: savedFormState.timerBackgroundRed,
+                green: savedFormState.timerBackgroundGreen,
+                blue: savedFormState.timerBackgroundBlue)
+            )
+            return
+        }
+        
         self._isPresented = isPresented
         let timer = appState.timerBeingEdited
         

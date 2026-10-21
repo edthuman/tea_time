@@ -8,18 +8,6 @@ class AppState: ObservableObject {
     @Published var isEditingTimers: Bool = false
     @Published var timerBeingEdited: Timer? = nil
     
-    @Environment(\.managedObjectContext) private var viewContext
-    
-    init() {
-        if let currentState = getCurrentSavedState(context: viewContext) {
-            folderId = currentState.folderId
-            isEditingTimers = currentState.isEditingTimers
-            folderBeingEdited = currentState.folderBeingEdited
-            isEditingFolders = currentState.isEditingFolders
-            timerBeingEdited = currentState.timerBeingEdited
-        }
-    }
-    
     func setFolder(_ selectedFolder: NSManagedObjectID?) {
         folderId = selectedFolder
     }

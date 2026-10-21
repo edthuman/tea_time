@@ -2,6 +2,8 @@ import CoreData
 import Foundation
 
 private let fileManager = FileManager.default
+private let stateFileName = "state.json"
+private let folderStateFileName = "folder-state.json"
 
 struct AppStateProps {
     var folderId: NSManagedObjectID? = nil
@@ -23,10 +25,6 @@ enum FormType: String, Codable {
     case Folder
     case Timer
 }
-
-private let fileManager = FileManager.default
-private let stateFileName = "state.json"
-private let folderStateFileName = "folder-state.json"
 
 func getStateDirectoryURL() throws -> URL {
     let appSupportURLs = fileManager.urls(
@@ -143,5 +141,22 @@ func saveFormState(formData: Data?) {
     }
     catch {
         printWithNewlineAbove(input: "Error occurred whilst saving form data \(error)")
+    }
+}
+
+func getSavedFolderState(_ formType: FormType) -> TimerFormData? {
+    do {
+        let stateDirectoryURL: URL = try getStateDirectoryURL()
+        let stateFileURL: URL = stateDirectoryURL.appendingPathComponent(folderStateFileName)
+        let data = try Data(contentsOf: stateFileURL)
+        let jsonDecoder: JSONDecoder = JSONDecoder()
+        let savedState = try jsonDecoder.decode(TimerFormData.self, from: data)
+        if formType == savedState.formType {
+            return savedState
+        }
+        return nil
+    }
+    catch {
+        return nil
     }
 }
