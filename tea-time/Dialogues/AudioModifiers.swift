@@ -20,6 +20,12 @@ struct RecordingDeniedAlertModifier: ViewModifier {
         content
             .alert("Microphone use denied", isPresented: $isPresented) {
                 Button("Change settings", role: .cancel) {
+                    appState.saveCurrentState()
+                    // EDTODO - Update AppState to init based on saved state
+                    // Add function to delete saved state when forms are
+                    // Update forms to read state from before the app was navigated away from
+                    // Trigger saved state deletion when form is closed
+                    
                     Task {
                         if let url = URL(string: UIApplication.openSettingsURLString) {
                             await UIApplication.shared.open(url)

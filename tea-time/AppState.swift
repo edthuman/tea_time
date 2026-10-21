@@ -35,6 +35,16 @@ class AppState: ObservableObject {
     func setTimerBeingEdited(_ timer: Timer?) {
         timerBeingEdited = timer
     }
+    
+    func saveCurrentState() {
+        saveState(
+            folderId: folderId,
+            isEditingFolders: isEditingFolders,
+            folderBeingEdited: folderBeingEdited,
+            isEditingTimers: isEditingTimers,
+            timerBeingEdited: timerBeingEdited
+        )
+    }
 }
 
 var appState = AppState()
