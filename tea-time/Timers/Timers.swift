@@ -17,10 +17,6 @@ struct BackButton: View {
     }
 }
 
-func setTimer(_ timer: String?) {
-    appState.setTimer(timer)
-}
-
 struct Timers: View {
     @ObservedObject var state = appState
     @State var showEditTimerForm: Bool = false
