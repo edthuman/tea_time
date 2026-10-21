@@ -8,12 +8,12 @@ func getFileName(_ item: NSManagedObject) -> String {
 }
 
 func getSoundsDirectoryURL() throws -> URL {
-    let librayURLs = fileManager.urls(
+    let libraryURLs = fileManager.urls(
         for: .libraryDirectory,
         in: .userDomainMask
     )
 
-    guard let libraryURL = librayURLs.first else {
+    guard let libraryURL = libraryURLs.first else {
         throw FileDirectoryErrors.libraryDirectoryNotFound
     }
     let soundsDirectoryURL: URL = libraryURL.appendingPathComponent("Sounds")
