@@ -19,6 +19,15 @@ struct StoredAppState: Codable {
     var timerBeingEditedIdUri: URL?
 }
 
+enum FormType: String, Codable {
+    case Folder
+    case Timer
+}
+
+private let fileManager = FileManager.default
+private let stateFileName = "state.json"
+private let folderStateFileName = "folder-state.json"
+
 func getStateDirectoryURL() throws -> URL {
     let appSupportURLs = fileManager.urls(
         for: .applicationSupportDirectory,
@@ -40,7 +49,7 @@ func getStateDirectoryURL() throws -> URL {
 
 func getStateURL() throws -> URL {
     let stateDirectoryURL: URL = try getStateDirectoryURL()
-    let stateFileURL: URL = stateDirectoryURL.appendingPathComponent("state.json")
+    let stateFileURL: URL = stateDirectoryURL.appendingPathComponent(stateFileName)
     return stateFileURL
 }
 
@@ -120,5 +129,19 @@ func getCurrentSavedState(context: NSManagedObjectContext) -> AppStateProps? {
         let nsError = error as NSError
         printWithNewlineAbove(input: "State file not found \(nsError), \(nsError.userInfo)")
         return nil
+    }
+}
+
+func saveFormState(formData: Data?) {
+    guard let formData else {
+        return
+    }
+    do {
+        let stateDirectoryURL: URL = try getStateDirectoryURL()
+        let stateFileURL: URL = stateDirectoryURL.appendingPathComponent(folderStateFileName)
+        try formData.write(to: stateFileURL)
+    }
+    catch {
+        printWithNewlineAbove(input: "Error occurred whilst saving form data \(error)")
     }
 }

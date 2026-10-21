@@ -15,14 +15,15 @@ struct AudioTooLongAlertModifier: ViewModifier {
 
 struct RecordingDeniedAlertModifier: ViewModifier {
     @Binding var isPresented: Bool
+    var formData: Data?
     
     func body(content: Content) -> some View {
         content
             .alert("Microphone use denied", isPresented: $isPresented) {
                 Button("Change settings", role: .cancel) {
                     appState.saveCurrentState()
-                    // EDTODO - Add function to delete saved state when forms are
-                    // Update forms to read state from before the app was navigated away from
+                    saveFormState(formData: formData)
+                    // EDTODO - Update forms to read state from before the app was navigated away from
                     // Trigger saved state deletion when form is closed
                     
                     Task {
@@ -46,9 +47,12 @@ extension View {
         )
     }
     
-    func recordingDeniedAlert(isPresented: Binding<Bool>) -> some View{
+    func recordingDeniedAlert(isPresented: Binding<Bool>, formData: Data?) -> some View{
         self.modifier(
-            RecordingDeniedAlertModifier(isPresented: isPresented)
+            RecordingDeniedAlertModifier(
+                isPresented: isPresented,
+                formData: formData
+            )
         )
     }
 }
