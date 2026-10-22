@@ -16,8 +16,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "649BC1DD2E65072000BBA553"
-               BuildableName = "tea-time.app"
-               BlueprintName = "tea-time"
+               BuildableName = "Tea Time.app"
+               BlueprintName = "Tea Time"
                ReferencedContainer = "container:tea-time.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -69,8 +69,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "649BC1DD2E65072000BBA553"
-            BuildableName = "tea-time.app"
-            BlueprintName = "tea-time"
+            BuildableName = "Tea Time.app"
+            BlueprintName = "Tea Time"
             ReferencedContainer = "container:tea-time.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -90,8 +90,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "649BC1DD2E65072000BBA553"
-            BuildableName = "tea-time.app"
-            BlueprintName = "tea-time"
+            BuildableName = "Tea Time.app"
+            BlueprintName = "Tea Time"
             ReferencedContainer = "container:tea-time.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
