@@ -17,6 +17,12 @@ struct Folders: View {
     )
     private var folders: FetchedResults<Folder>
     
+    init() {
+        if getSavedFolderState(as: FolderFormData.self, formType: FormType.Folder) != nil {
+            _showEditFolderForm = State(initialValue: true)
+        }
+    }
+    
     var body: some View {
         if (!folders.isEmpty) {
             EditFoldersButton()

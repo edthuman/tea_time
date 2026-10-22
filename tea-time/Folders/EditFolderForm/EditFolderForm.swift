@@ -1,6 +1,20 @@
 import SwiftUI
 import CoreData
 
+struct FolderFormData: Codable, HasFormType {
+    var formType = FormType.Folder
+    var isAdding: Bool
+    var folderName: String
+    var textRed: Double
+    var textGreen: Double
+    var textBlue: Double
+    var folderBackgroundRed: Double
+    var folderBackgroundGreen: Double
+    var folderBackgroundBlue: Double
+    var audioURL: URL?
+    var hasAudioChanged: Bool
+}
+
 struct EditFolderForm: View {
     @ObservedObject var state = appState
     @Environment(\.managedObjectContext) private var viewContext
@@ -100,7 +114,65 @@ struct EditFolderForm: View {
         }
     }
     
+    private func getFormData() -> Data? {
+        // Text colour
+        let textColor = UIColor(newTextColour).cgColor.components
+        let textRed = Double(textColor?[0] ?? 0)
+        let textGreen = Double(textColor?[1] ?? 0)
+        let textBlue = Double(textColor?[2] ?? 0)
+        
+        // Background colour
+        let folderBackgroundColor = UIColor(newFolderBackground).cgColor.components
+        let folderBackgroundRed = Double(folderBackgroundColor?[0] ?? 0)
+        let folderBackgroundGreen = Double(folderBackgroundColor?[1] ?? 0)
+        let folderBackgroundBlue = Double(folderBackgroundColor?[2] ?? 0)
+        
+        let formData = FolderFormData(
+            formType: FormType.Folder,
+            isAdding: isAdding,
+            folderName: newFolderName,
+            textRed: textRed,
+            textGreen: textGreen,
+            textBlue: textBlue,
+            folderBackgroundRed: folderBackgroundRed,
+            folderBackgroundGreen: folderBackgroundGreen,
+            folderBackgroundBlue: folderBackgroundBlue,
+            audioURL: audioURL,
+            hasAudioChanged: hasAudioChanged
+        )
+        let jsonEncoder = JSONEncoder()
+        do {
+            let data = try jsonEncoder.encode(formData)
+            return data
+        }
+        catch {
+            return nil
+        }
+    }
+    
     init(isPresented: Binding<Bool>) {
+        let savedFormState = getSavedFolderState(as: FolderFormData.self, formType: FormType.Folder)
+        if let savedFormState {
+            self._isPresented = isPresented
+            
+            _isAdding = State(initialValue: savedFormState.isAdding)
+            _audioURL = State(initialValue: savedFormState.audioURL) // EDTODO - verify if this remains correct after audio file handling is done
+            _hasAudioChanged = State(initialValue: savedFormState.hasAudioChanged)
+            
+            _newFolderName = State(initialValue: savedFormState.folderName)
+            _newTextColour = State(initialValue: Color(
+                red: savedFormState.textRed,
+                green: savedFormState.textGreen,
+                blue: savedFormState.textBlue)
+            )
+            _newFolderBackground = State(initialValue: Color(
+                red: savedFormState.folderBackgroundRed,
+                green: savedFormState.folderBackgroundGreen,
+                blue: savedFormState.folderBackgroundBlue)
+            )
+            return
+        }
+        
         self._isPresented = isPresented
         let folder = appState.folderBeingEdited
         _isAdding = State(initialValue: folder == nil)
@@ -171,7 +243,10 @@ struct EditFolderForm: View {
                 height: screenHeight * 0.95
             )
             .audioTooLongAlert(isPresented: $audioTooLong)
-            .recordingDeniedAlert(isPresented: $recorder.recorderDenied)
+            .recordingDeniedAlert(
+                isPresented: $recorder.recorderDenied,
+                formData: getFormData()
+            )
         }
         .onDisappear {
             if recorder.status == RecorderStatus.recording {

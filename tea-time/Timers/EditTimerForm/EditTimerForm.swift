@@ -7,7 +7,7 @@ enum TimePeriods: String, Codable {
     case hours
 }
 
-struct TimerFormData: Codable {
+struct TimerFormData: Codable, HasFormType {
     var formType = FormType.Timer
     var isAdding: Bool
     var timerName: String
@@ -173,7 +173,7 @@ struct EditTimerForm: View {
     }
     
     init(isPresented: Binding<Bool>) {
-        let savedFormState = getSavedFolderState(FormType.Timer)
+        let savedFormState = getSavedFolderState(as: TimerFormData.self, formType: FormType.Timer)
         if let savedFormState {
             self._isPresented = isPresented
             

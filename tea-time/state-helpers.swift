@@ -21,6 +21,10 @@ struct StoredAppState: Codable {
     var timerBeingEditedIdUri: URL?
 }
 
+protocol HasFormType {
+    var formType: FormType { get }
+}
+
 enum FormType: String, Codable {
     case Folder
     case Timer
@@ -144,13 +148,13 @@ func saveFormState(formData: Data?) {
     }
 }
 
-func getSavedFolderState(_ formType: FormType) -> TimerFormData? {
+func getSavedFolderState<T: Codable & HasFormType>(as: T.Type, formType: FormType) -> T? {
     do {
         let stateDirectoryURL: URL = try getStateDirectoryURL()
         let stateFileURL: URL = stateDirectoryURL.appendingPathComponent(folderStateFileName)
         let data = try Data(contentsOf: stateFileURL)
         let jsonDecoder: JSONDecoder = JSONDecoder()
-        let savedState = try jsonDecoder.decode(TimerFormData.self, from: data)
+        let savedState = try jsonDecoder.decode(T.self, from: data)
         if formType == savedState.formType {
             return savedState
         }
