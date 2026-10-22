@@ -23,8 +23,6 @@ struct RecordingDeniedAlertModifier: ViewModifier {
                 Button("Change settings", role: .cancel) {
                     appState.saveCurrentState()
                     saveFormState(formData: formData)
-                    // EDTODO - Update forms to read state from before the app was navigated away from
-                    // Trigger saved state deletion when form is closed
                     
                     Task {
                         if let url = URL(string: UIApplication.openSettingsURLString) {
