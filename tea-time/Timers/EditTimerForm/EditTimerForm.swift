@@ -179,8 +179,8 @@ struct EditTimerForm: View {
             self._isPresented = isPresented
             
             _isAdding = State(initialValue: savedFormState.isAdding)
-            _audioURL = State(initialValue: savedFormState.audioURL) // EDTODO - verify if this remains correct after audio file handling is done
-            _hasAudioChanged = State(initialValue: savedFormState.hasAudioChanged)
+            // EDTODO - Delete the file whenever saved state is cleared
+            // Add the same to EditFolderForm
             
             _newTimerName = State(initialValue: savedFormState.timerName)
             _newTimerLength = State(initialValue: savedFormState.timerLength)
@@ -195,6 +195,21 @@ struct EditTimerForm: View {
                 green: savedFormState.timerBackgroundGreen,
                 blue: savedFormState.timerBackgroundBlue)
             )
+            
+            if savedFormState.hasAudioChanged == true {
+                let audioURL: URL?
+                do {
+                    audioURL = try getSoundFileURL(fileName: audioStateFileName)
+                    _hasAudioChanged = State(initialValue: true)
+                    _audioURL = State(initialValue: audioURL)
+                } catch {
+                    _hasAudioChanged = State(initialValue: false)
+                    intialiseTimerFileURL()
+                }
+            } else {
+                _hasAudioChanged = State(initialValue: false)
+                intialiseTimerFileURL()
+            }
             return
         }
         
@@ -292,7 +307,8 @@ struct EditTimerForm: View {
             .audioTooLongAlert(isPresented: $audioTooLong)
             .recordingDeniedAlert(
                 isPresented: $recorder.recorderDenied,
-                formData: getFormData()
+                formData: getFormData(),
+                audioURL: hasAudioChanged ? audioURL : nil
             )
         }
         .onDisappear {

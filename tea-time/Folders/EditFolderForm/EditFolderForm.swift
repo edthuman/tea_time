@@ -157,8 +157,6 @@ struct EditFolderForm: View {
             self._isPresented = isPresented
             
             _isAdding = State(initialValue: savedFormState.isAdding)
-            _audioURL = State(initialValue: savedFormState.audioURL) // EDTODO - verify if this remains correct after audio file handling is done
-            _hasAudioChanged = State(initialValue: savedFormState.hasAudioChanged)
             
             _newFolderName = State(initialValue: savedFormState.folderName)
             _newTextColour = State(initialValue: Color(
@@ -171,6 +169,21 @@ struct EditFolderForm: View {
                 green: savedFormState.folderBackgroundGreen,
                 blue: savedFormState.folderBackgroundBlue)
             )
+            
+            if savedFormState.hasAudioChanged == true {
+                let audioURL: URL?
+                do {
+                    audioURL = try getSoundFileURL(fileName: audioStateFileName)
+                    _hasAudioChanged = State(initialValue: true)
+                    _audioURL = State(initialValue: audioURL)
+                } catch {
+                    _hasAudioChanged = State(initialValue: false)
+                    intialiseFolderFileURL()
+                }
+            } else {
+                _hasAudioChanged = State(initialValue: false)
+                intialiseFolderFileURL()
+            }
             return
         }
         
@@ -246,7 +259,8 @@ struct EditFolderForm: View {
             .audioTooLongAlert(isPresented: $audioTooLong)
             .recordingDeniedAlert(
                 isPresented: $recorder.recorderDenied,
-                formData: getFormData()
+                formData: getFormData(),
+                audioURL: hasAudioChanged ? audioURL : nil
             )
         }
         .onDisappear {

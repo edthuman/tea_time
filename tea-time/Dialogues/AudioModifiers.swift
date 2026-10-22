@@ -16,6 +16,7 @@ struct AudioTooLongAlertModifier: ViewModifier {
 struct RecordingDeniedAlertModifier: ViewModifier {
     @Binding var isPresented: Bool
     var formData: Data?
+    var audioURL: URL?
     
     func body(content: Content) -> some View {
         content
@@ -23,6 +24,7 @@ struct RecordingDeniedAlertModifier: ViewModifier {
                 Button("Change settings", role: .cancel) {
                     appState.saveCurrentState()
                     saveFormState(formData: formData)
+                    saveAudioState(audioURL: audioURL)
                     
                     Task {
                         if let url = URL(string: UIApplication.openSettingsURLString) {
@@ -45,11 +47,12 @@ extension View {
         )
     }
     
-    func recordingDeniedAlert(isPresented: Binding<Bool>, formData: Data?) -> some View{
+    func recordingDeniedAlert(isPresented: Binding<Bool>, formData: Data?, audioURL: URL?) -> some View{
         self.modifier(
             RecordingDeniedAlertModifier(
                 isPresented: isPresented,
-                formData: formData
+                formData: formData,
+                audioURL: audioURL
             )
         )
     }

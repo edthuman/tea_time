@@ -4,6 +4,7 @@ import Foundation
 private let fileManager = FileManager.default
 private let stateFileName = "state.json"
 private let formStateFileName = "form-state.json"
+let audioStateFileName = "audio-state"
 
 struct AppStateProps {
     var folderId: NSManagedObjectID? = nil
@@ -186,4 +187,15 @@ func deleteSavedState() {
     catch {
         printWithNewlineAbove(input: "Form state failed to delete \(error)")
     }
+}
+
+func saveAudioState(audioURL: URL?) {
+    guard let audioURL else {
+        return
+    }
+    saveNotificationSound(
+        fileURL: audioURL,
+        fileName: audioStateFileName,
+        hasAudioChanged: true
+    )
 }
