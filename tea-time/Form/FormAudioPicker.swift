@@ -56,7 +56,9 @@ struct FormAudioPicker: View {
                 if (recorder.status == .recording) {
                     recorder.stopRecording()
                 } else {
-                    recorder.startRecording(outputURL: recordingURL)
+                    Task {
+                        await recorder.startRecording(outputURL: recordingURL)
+                    }
                 }
             } label: {
                 Image(

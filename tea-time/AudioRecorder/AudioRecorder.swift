@@ -7,12 +7,37 @@ class AudioRecorder {
     private var audioFile: AVAudioFile?
     
     var status: RecorderStatus = RecorderStatus.idle
+    var recorderDenied: Bool = false
     var framesRecorded: AVAudioFrameCount = 0
     var maximumFrames: AVAudioFrameCount = 0
     
-    func startRecording(outputURL: URL) {
+    func checkPermission() async -> Bool {
+        let recordPermission = AVAudioApplication.shared.recordPermission
+        if recordPermission == .denied {
+            return false
+        }
+        
+        if recordPermission == .undetermined {
+            await AVAudioApplication.requestRecordPermission()
+            if AVAudioApplication.shared.recordPermission != .granted {
+                return false
+            }
+        }
+
+        return true
+    }
+    
+    func startRecording(outputURL: URL) async {
         status = RecorderStatus.transitioning
         framesRecorded = 0
+        
+        let permissionGranted = await checkPermission()
+        guard permissionGranted else {
+            status = RecorderStatus.idle
+            recorderDenied = true
+            return
+        }
+
         let session = AVAudioSession.sharedInstance()
         
         do {

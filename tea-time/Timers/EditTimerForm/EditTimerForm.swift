@@ -1,10 +1,26 @@
 import SwiftUI
 import CoreData
 
-enum TimePeriods {
+enum TimePeriods: String, Codable {
     case seconds
     case minutes
     case hours
+}
+
+struct TimerFormData: Codable, HasFormType {
+    var formType = FormType.Timer
+    var isAdding: Bool
+    var timerName: String
+    var timerLength: String
+    var selectedTimePeriod: TimePeriods
+    var textRed: Double
+    var textGreen: Double
+    var textBlue: Double
+    var timerBackgroundRed: Double
+    var timerBackgroundGreen: Double
+    var timerBackgroundBlue: Double
+    var audioURL: URL?
+    var hasAudioChanged: Bool
 }
 
 struct EditTimerForm: View {
@@ -31,6 +47,7 @@ struct EditTimerForm: View {
             recorder.stopRecording()
         }
         clearTemporaryDirectory()
+        deleteSavedState()
         
         newTimerName = ""
         newTimerLength = "1"
@@ -118,7 +135,82 @@ struct EditTimerForm: View {
         _audioURL = State(initialValue: fileURL)
     }
     
+    private func getFormData() -> Data? {
+        // Text colour
+        let textColor = UIColor(newTextColour).cgColor.components
+        let textRed = Double(textColor?[0] ?? 0)
+        let textGreen = Double(textColor?[1] ?? 0)
+        let textBlue = Double(textColor?[2] ?? 0)
+        
+        // Background colour
+        let timerBackgroundColor = UIColor(newTimerBackground).cgColor.components
+        let timerBackgroundRed = Double(timerBackgroundColor?[0] ?? 0)
+        let timerBackgroundGreen = Double(timerBackgroundColor?[1] ?? 0)
+        let timerBackgroundBlue = Double(timerBackgroundColor?[2] ?? 0)
+        
+        let formData = TimerFormData(
+            formType: FormType.Timer,
+            isAdding: isAdding,
+            timerName: newTimerName,
+            timerLength: newTimerLength,
+            selectedTimePeriod: selectedTimePeriod,
+            textRed: textRed,
+            textGreen: textGreen,
+            textBlue: textBlue,
+            timerBackgroundRed: timerBackgroundRed,
+            timerBackgroundGreen: timerBackgroundGreen,
+            timerBackgroundBlue: timerBackgroundBlue,
+            audioURL: audioURL,
+            hasAudioChanged: hasAudioChanged
+        )
+        let jsonEncoder = JSONEncoder()
+        do {
+            let data = try jsonEncoder.encode(formData)
+            return data
+        }
+        catch {
+            return nil
+        }
+    }
+    
     init(isPresented: Binding<Bool>) {
+        let savedFormState = getSavedFolderState(as: TimerFormData.self, formType: FormType.Timer)
+        if let savedFormState {
+            self._isPresented = isPresented
+            
+            _isAdding = State(initialValue: savedFormState.isAdding)
+            
+            _newTimerName = State(initialValue: savedFormState.timerName)
+            _newTimerLength = State(initialValue: savedFormState.timerLength)
+            _selectedTimePeriod = State(initialValue: savedFormState.selectedTimePeriod)
+            _newTextColour = State(initialValue: Color(
+                red: savedFormState.textRed,
+                green: savedFormState.textGreen,
+                blue: savedFormState.textBlue)
+            )
+            _newTimerBackground = State(initialValue: Color(
+                red: savedFormState.timerBackgroundRed,
+                green: savedFormState.timerBackgroundGreen,
+                blue: savedFormState.timerBackgroundBlue)
+            )
+            
+            if savedFormState.hasAudioChanged == true {
+                let audioURL: URL?
+                do {
+                    audioURL = try getSoundFileURL(fileName: audioStateFileName)
+                    _hasAudioChanged = State(initialValue: true)
+                    _audioURL = State(initialValue: audioURL)
+                } catch {
+                    _hasAudioChanged = State(initialValue: false)
+                    intialiseTimerFileURL()
+                }
+            } else {
+                _hasAudioChanged = State(initialValue: false)
+                intialiseTimerFileURL()
+            }
+            return
+        }
+        
         self._isPresented = isPresented
         let timer = appState.timerBeingEdited
         
@@ -211,6 +303,11 @@ struct EditTimerForm: View {
                 height: screenHeight * 0.95
             )
             .audioTooLongAlert(isPresented: $audioTooLong)
+            .recordingDeniedAlert(
+                isPresented: $recorder.recorderDenied,
+                formData: getFormData(),
+                audioURL: hasAudioChanged ? audioURL : nil
+            )
         }
         .onDisappear {
             if recorder.status == .recording {

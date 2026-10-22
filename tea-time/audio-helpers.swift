@@ -8,12 +8,12 @@ func getFileName(_ item: NSManagedObject) -> String {
 }
 
 func getSoundsDirectoryURL() throws -> URL {
-    let librayURLs = fileManager.urls(
+    let libraryURLs = fileManager.urls(
         for: .libraryDirectory,
         in: .userDomainMask
     )
 
-    guard let libraryURL = librayURLs.first else {
+    guard let libraryURL = libraryURLs.first else {
         throw FileDirectoryErrors.libraryDirectoryNotFound
     }
     let soundsDirectoryURL: URL = libraryURL.appendingPathComponent("Sounds")
@@ -99,7 +99,7 @@ func saveNotificationSound(fileURL: URL?, fileName: String, hasAudioChanged: Boo
     }
 }
 
-func checkFileExists(fileName: String) -> Bool {
+func checkSoundFileExists(fileName: String) -> Bool {
     do {
         let soundFileURL = try getSoundFileURL(fileName: fileName)
         return fileManager.fileExists(atPath: soundFileURL.path)

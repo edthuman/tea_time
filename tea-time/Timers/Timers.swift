@@ -17,10 +17,6 @@ struct BackButton: View {
     }
 }
 
-func setTimer(_ timer: String?) {
-    appState.setTimer(timer)
-}
-
 struct Timers: View {
     @ObservedObject var state = appState
     @State var showEditTimerForm: Bool = false
@@ -37,6 +33,10 @@ struct Timers: View {
             sortDescriptors: [NSSortDescriptor(keyPath: \Timer.timerName, ascending: true)],
             predicate: NSPredicate(format: "folder == %@", folderId)
         )
+        
+        if getSavedFolderState(as: TimerFormData.self, formType: FormType.Timer) != nil {
+            _showEditTimerForm = State(initialValue: true)
+        }
     }
     
     var body: some View {
