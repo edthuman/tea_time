@@ -3,7 +3,7 @@ import Foundation
 
 private let fileManager = FileManager.default
 private let stateFileName = "state.json"
-private let folderStateFileName = "folder-state.json"
+private let formStateFileName = "form-state.json"
 
 struct AppStateProps {
     var folderId: NSManagedObjectID? = nil
@@ -49,9 +49,15 @@ func getStateDirectoryURL() throws -> URL {
     return stateDirectoryURL
 }
 
-func getStateURL() throws -> URL {
+func getAppStateURL() throws -> URL {
     let stateDirectoryURL: URL = try getStateDirectoryURL()
     let stateFileURL: URL = stateDirectoryURL.appendingPathComponent(stateFileName)
+    return stateFileURL
+}
+
+func getFormStateURL() throws -> URL {
+    let stateDirectoryURL: URL = try getStateDirectoryURL()
+    let stateFileURL: URL = stateDirectoryURL.appendingPathComponent(formStateFileName)
     return stateFileURL
 }
 
@@ -67,7 +73,7 @@ func saveState(folderId: NSManagedObjectID?, isEditingFolders: Bool, folderBeing
     let jsonEncoder: JSONEncoder = JSONEncoder()
     
     do {
-        let stateFileURL: URL = try getStateURL()
+        let stateFileURL: URL = try getAppStateURL()
         let stateToSave: Data = try jsonEncoder.encode(state)
         try stateToSave.write(to: stateFileURL)
     }
@@ -123,7 +129,7 @@ func getObjectFromIDUri(context: NSManagedObjectContext, uri: URL?) -> NSManaged
 
 func getCurrentSavedState(context: NSManagedObjectContext) -> AppStateProps? {
     do {
-        let stateFileURL: URL = try getStateURL()
+        let stateFileURL: URL = try getAppStateURL()
         let stateFile: Data? = try Data(contentsOf: stateFileURL)
         return try getStateFromJSON(context: context, data: stateFile)
     }
@@ -139,8 +145,7 @@ func saveFormState(formData: Data?) {
         return
     }
     do {
-        let stateDirectoryURL: URL = try getStateDirectoryURL()
-        let stateFileURL: URL = stateDirectoryURL.appendingPathComponent(folderStateFileName)
+        let stateFileURL: URL = try getFormStateURL()
         try formData.write(to: stateFileURL)
     }
     catch {
@@ -151,7 +156,7 @@ func saveFormState(formData: Data?) {
 func getSavedFolderState<T: Codable & HasFormType>(as: T.Type, formType: FormType) -> T? {
     do {
         let stateDirectoryURL: URL = try getStateDirectoryURL()
-        let stateFileURL: URL = stateDirectoryURL.appendingPathComponent(folderStateFileName)
+        let stateFileURL: URL = stateDirectoryURL.appendingPathComponent(formStateFileName)
         let data = try Data(contentsOf: stateFileURL)
         let jsonDecoder: JSONDecoder = JSONDecoder()
         let savedState = try jsonDecoder.decode(T.self, from: data)
@@ -162,5 +167,23 @@ func getSavedFolderState<T: Codable & HasFormType>(as: T.Type, formType: FormTyp
     }
     catch {
         return nil
+    }
+}
+
+func deleteSavedState() {
+    do {
+        let appStateURL: URL = try getAppStateURL()
+        try fileManager.removeItem(at: appStateURL)
+    }
+    catch {
+        printWithNewlineAbove(input: "App state failed to delte \(error)")
+    }
+    
+    do {
+        let formStateURL = try getFormStateURL()
+        try fileManager.removeItem(at: formStateURL)
+    }
+    catch {
+        printWithNewlineAbove(input: "Form state failed to delete \(error)")
     }
 }

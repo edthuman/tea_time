@@ -47,6 +47,7 @@ struct EditTimerForm: View {
             recorder.stopRecording()
         }
         clearTemporaryDirectory()
+        deleteSavedState()
         
         newTimerName = ""
         newTimerLength = "1"

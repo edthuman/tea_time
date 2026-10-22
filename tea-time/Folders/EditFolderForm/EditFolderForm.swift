@@ -37,6 +37,7 @@ struct EditFolderForm: View {
             recorder.stopRecording()
         }
         clearTemporaryDirectory()
+        deleteSavedState()
 
         newFolderName = ""
         newTextColour = .white
