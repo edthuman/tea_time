@@ -74,7 +74,7 @@ func saveState(folderId: NSManagedObjectID?, isEditingFolders: Bool, folderBeing
     }
     catch {
         printWithNewlineAbove(input: "Failed to write state file: \(error)")
-        // EDTODO - Decide whether this error could be better handled
+        // EDTODO - Look into logging error details
     }
 }
 

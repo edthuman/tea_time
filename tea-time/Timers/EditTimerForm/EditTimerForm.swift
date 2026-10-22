@@ -179,8 +179,6 @@ struct EditTimerForm: View {
             self._isPresented = isPresented
             
             _isAdding = State(initialValue: savedFormState.isAdding)
-            // EDTODO - Delete the file whenever saved state is cleared
-            // Add the same to EditFolderForm
             
             _newTimerName = State(initialValue: savedFormState.timerName)
             _newTimerLength = State(initialValue: savedFormState.timerLength)
