@@ -50,15 +50,9 @@ func getStateDirectoryURL() throws -> URL {
     return stateDirectoryURL
 }
 
-func getAppStateURL() throws -> URL {
+func getStateURL(_ fileName: String) throws -> URL {
     let stateDirectoryURL: URL = try getStateDirectoryURL()
-    let stateFileURL: URL = stateDirectoryURL.appendingPathComponent(stateFileName)
-    return stateFileURL
-}
-
-func getFormStateURL() throws -> URL {
-    let stateDirectoryURL: URL = try getStateDirectoryURL()
-    let stateFileURL: URL = stateDirectoryURL.appendingPathComponent(formStateFileName)
+    let stateFileURL: URL = stateDirectoryURL.appendingPathComponent(fileName)
     return stateFileURL
 }
 
@@ -74,7 +68,7 @@ func saveState(folderId: NSManagedObjectID?, isEditingFolders: Bool, folderBeing
     let jsonEncoder: JSONEncoder = JSONEncoder()
     
     do {
-        let stateFileURL: URL = try getAppStateURL()
+        let stateFileURL: URL = try getStateURL(stateFileName)
         let stateToSave: Data = try jsonEncoder.encode(state)
         try stateToSave.write(to: stateFileURL)
     }
@@ -130,7 +124,7 @@ func getObjectFromIDUri(context: NSManagedObjectContext, uri: URL?) -> NSManaged
 
 func getCurrentSavedState(context: NSManagedObjectContext) -> AppStateProps? {
     do {
-        let stateFileURL: URL = try getAppStateURL()
+        let stateFileURL: URL = try getStateURL(stateFileName)
         let stateFile: Data? = try Data(contentsOf: stateFileURL)
         return try getStateFromJSON(context: context, data: stateFile)
     }
@@ -146,7 +140,7 @@ func saveFormState(formData: Data?) {
         return
     }
     do {
-        let stateFileURL: URL = try getFormStateURL()
+        let stateFileURL: URL = try getStateURL(formStateFileName)
         try formData.write(to: stateFileURL)
     }
     catch {
@@ -173,7 +167,7 @@ func getSavedFolderState<T: Codable & HasFormType>(as: T.Type, formType: FormTyp
 
 func deleteSavedState() {
     do {
-        let appStateURL: URL = try getAppStateURL()
+        let appStateURL: URL = try getStateURL(stateFileName)
         try fileManager.removeItem(at: appStateURL)
     }
     catch {
@@ -181,11 +175,19 @@ func deleteSavedState() {
     }
     
     do {
-        let formStateURL = try getFormStateURL()
+        let formStateURL = try getStateURL(formStateFileName)
         try fileManager.removeItem(at: formStateURL)
     }
     catch {
         printWithNewlineAbove(input: "Form state failed to delete \(error)")
+    }
+    
+    do {
+        let audioStateURL = try getStateURL(audioStateFileName)
+        try fileManager.removeItem(at: audioStateURL)
+    }
+    catch {
+        printWithNewlineAbove(input: "Audio state file failed to delete \(error)")
     }
 }
 
