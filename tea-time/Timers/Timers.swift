@@ -23,6 +23,7 @@ struct Timers: View {
     @State var showDelete: Bool = false
     let folderId: NSManagedObjectID
     
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest var timers: FetchedResults<Timer>
     
@@ -48,11 +49,12 @@ struct Timers: View {
                     EditTimersButton()
                 }
             }
+            .padding(.top, getCommandBarPadding(verticalSizeClass))
             
             GeometryReader { geometry in
                 let screenHeight = geometry.size.height
                 
-                VStack {
+                VStack (spacing: 0) {
                     Group {
                         if (timers.isEmpty) {
                             EmptyListMessage(message: "No timers")
@@ -66,10 +68,11 @@ struct Timers: View {
                             }
                         }
                     }
-                    .frame(height: screenHeight * 0.94)
+                    .frame(height: getListHeight(screenHeight))
                     .padding(.bottom, 10)
                     
                     AddTimerButton()
+                    .padding(.bottom, getAddButtonPadding(screenHeight))
                 }
                 .frame(maxWidth: .infinity)
             }
