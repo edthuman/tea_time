@@ -252,27 +252,29 @@ struct EditTimerForm: View {
             let screenWidth = geometry.size.width
             let screenHeight = geometry.size.height
             
-            CloseButton(close: resetState)
+            ZStack (alignment: .top) {
+                ScrollView {
+                    TimerFormElements(
+                        screenWidth: screenWidth,
+                        screenHeight: screenHeight,
+                        recorder: recorder,
+                        saveChanges: saveChanges,
+                        resetState: resetState,
+                        newTimerName: $newTimerName,
+                        newTimerLength: $newTimerLength,
+                        selectedTimePeriod: $selectedTimePeriod,
+                        newTextColour: $newTextColour,
+                        newTimerBackground: $newTimerBackground,
+                        audioURL: $audioURL,
+                        audioTooLong: $audioTooLong,
+                        hasAudioChanged: $hasAudioChanged
+                    )
+                    .frame(minHeight: screenHeight)
+                }
+                .frame(height: screenHeight)
                 
-            ScrollView {
-                TimerFormElements(
-                    screenWidth: screenWidth,
-                    screenHeight: screenHeight,
-                    recorder: recorder,
-                    saveChanges: saveChanges,
-                    resetState: resetState,
-                    newTimerName: $newTimerName,
-                    newTimerLength: $newTimerLength,
-                    selectedTimePeriod: $selectedTimePeriod,
-                    newTextColour: $newTextColour,
-                    newTimerBackground: $newTimerBackground,
-                    audioURL: $audioURL,
-                    audioTooLong: $audioTooLong,
-                    hasAudioChanged: $hasAudioChanged
-                )
-                .frame(minHeight: screenHeight)
+                CloseButton(close: resetState)
             }
-            .frame(height: screenHeight)
         }
         .audioTooLongAlert(isPresented: $audioTooLong)
         .recordingDeniedAlert(
