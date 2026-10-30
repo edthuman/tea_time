@@ -7,9 +7,9 @@ struct CloseButton: View {
         Button(action: close) {
             Image(systemName: "xmark")
                 .foregroundStyle(.gray)
+                .padding(.vertical, 17)
+                .padding(.horizontal, 17)
         }
         .frame(maxWidth: .infinity, alignment: .trailing)
-        .padding(.top, 17)
-        .padding(.trailing, 17)
     }
 }

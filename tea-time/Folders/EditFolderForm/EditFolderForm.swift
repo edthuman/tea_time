@@ -219,50 +219,35 @@ struct EditFolderForm: View {
             let screenWidth = geometry.size.width
             let screenHeight = geometry.size.height
             
-            CloseButton(close: resetState)
-
-            VStack {
-                FormButtonName(
-                    name: $newFolderName,
-                    textColour: newTextColour,
-                    backgroundColour: newFolderBackground
-                )
-                .frame(maxWidth: screenWidth * 0.39)
-                .padding(.bottom, 10)
+            
+            ZStack (alignment: .top) {
+                ScrollView {
+                    FolderFormElements(
+                        screenWidth: screenWidth,
+                        screenHeight: screenHeight,
+                        recorder: recorder,
+                        saveChanges: saveChanges,
+                        resetState: resetState,
+                        newFolderName: $newFolderName,
+                        newTextColour: $newTextColour,
+                        newFolderBackground: $newFolderBackground,
+                        audioURL: $audioURL,
+                        audioTooLong: $audioTooLong,
+                        hasAudioChanged: $hasAudioChanged
+                    )
+                    .frame(minHeight: screenHeight)
+                }
+                .frame(height: screenHeight)
                 
-                FormColourPicker("Text Colour", colour: $newTextColour)
-                    .frame(width: screenWidth * 0.45)
-                
-                FormColourPicker("Background Colour", colour: $newFolderBackground)
-                    .frame(width: screenWidth * 0.45)
-                
-                FormAudioPicker(
-                    audioURL: $audioURL,
-                    selectionTooLong: $audioTooLong,
-                    hasChanged: $hasAudioChanged,
-                    recorder: recorder,
-                )
-                .padding(.top, 10)
-                .padding(.bottom, 8)
-                
-                FormFinishButtons(
-                    save: saveChanges,
-                    disableSave: recorder.status != RecorderStatus.idle,
-                    cancel: resetState
-                )
-                .padding(.top, 5)
+                CloseButton(close: resetState)
             }
-            .frame(
-                width: screenWidth,
-                height: screenHeight * 0.95
-            )
-            .audioTooLongAlert(isPresented: $audioTooLong)
-            .recordingDeniedAlert(
-                isPresented: $recorder.recorderDenied,
-                formData: getFormData(),
-                audioURL: hasAudioChanged ? audioURL : nil
-            )
         }
+        .audioTooLongAlert(isPresented: $audioTooLong)
+        .recordingDeniedAlert(
+            isPresented: $recorder.recorderDenied,
+            formData: getFormData(),
+            audioURL: hasAudioChanged ? audioURL : nil
+        )
         .onDisappear {
             if recorder.status == RecorderStatus.recording {
                 recorder.stopRecording()

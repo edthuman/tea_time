@@ -8,35 +8,38 @@ struct TimersList: View {
     let timers: FetchedResults<Timer>
     
     var body: some View {
-        VStack (spacing: 20) {
-            ForEach(timers) { (timer: Timer) in
-                if state.isEditingTimers {
-                    HStack {
-                        TimerButton(timer: timer)
-                        
-                        Button {
-                            state.setTimerBeingEdited(timer)
-                            showEditTimerForm = true
-                        } label: {
-                            Image(systemName: "square.and.pencil")
-                                .foregroundStyle(.blue)
-                                .padding(.horizontal, 10)
+        GeometryReader { geometry in
+            let screenWidth = geometry.size.width
+            
+            VStack (spacing: 20) {
+                ForEach(timers) { (timer: Timer) in
+                    if state.isEditingTimers {
+                        HStack {
+                            TimerButton(timer: timer, screenWidth: screenWidth)
+                            
+                            Button {
+                                state.setTimerBeingEdited(timer)
+                                showEditTimerForm = true
+                            } label: {
+                                Image(systemName: "square.and.pencil")
+                                    .foregroundStyle(.blue)
+                                    .padding(.horizontal, 10)
+                            }
+                            
+                            Button {
+                                state.setTimerBeingEdited(timer)
+                                showDelete = true
+                            } label: {
+                                Image(systemName: "trash")
+                                    .foregroundStyle(.red)
+                            }
                         }
-                        
-                        Button {
-                            state.setTimerBeingEdited(timer)
-                            showDelete = true
-                        } label: {
-                            Image(systemName: "trash")
-                                .foregroundStyle(.red)
-                        }
+                    } else {
+                        TimerButton(timer: timer, screenWidth: screenWidth)
                     }
-                } else {
-                    TimerButton(timer: timer)
                 }
-                
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(maxWidth: .infinity)
     }
 }

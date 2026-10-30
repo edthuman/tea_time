@@ -10,6 +10,7 @@ struct Folders: View {
     @State var showEditFolderForm: Bool = false
     @State var showDelete: Bool = false
     
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Folder.folderName, ascending: true)],
@@ -26,12 +27,13 @@ struct Folders: View {
     var body: some View {
         if (!folders.isEmpty) {
             EditFoldersButton()
+            .padding(.top, getCommandBarPadding(verticalSizeClass))
         }
 
         GeometryReader { geometry in
             let screenHeight = geometry.size.height
             
-            VStack {
+            VStack (spacing: 0) {
                 Group {
                     if (folders.isEmpty) {
                         EmptyListMessage(message: "No folders")
@@ -45,10 +47,11 @@ struct Folders: View {
                         }
                     }
                 }
-                .frame(height: screenHeight * 0.94)
+                .frame(height: getListHeight(screenHeight))
                 .padding(.bottom, 10)
                 
                 AddFolderButton()
+                .padding(.bottom, getAddButtonPadding(screenHeight))
             }
             .frame(maxWidth: .infinity)
         }

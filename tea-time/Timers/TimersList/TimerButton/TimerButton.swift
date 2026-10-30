@@ -2,7 +2,7 @@ import SwiftUI
 
 struct TimerButton: View {
     @ObservedObject var timer: Timer
-    let screenWidth = UIScreen.main.bounds.width
+    let screenWidth: CGFloat
     
     var timerName: String {
         timer.timerName ?? ""
@@ -22,7 +22,7 @@ struct TimerButton: View {
                 .foregroundStyle(
                     Color(red: timer.textRed, green: timer.textGreen, blue: timer.textBlue))
                 .fontWeight(.bold)
-                .frame(maxWidth: screenWidth * 0.36)
+                .frame(width: screenWidth * 0.36)
                 .padding(20)
         }
         .background(
