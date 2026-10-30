@@ -44,13 +44,22 @@ func getStateDirectoryURL() throws -> URL {
     return stateDirectoryURL
 }
 
+func createStateDirectory() throws {
+    let stateDirectoryURL: URL = try getStateDirectoryURL()
+    try fileManager.createDirectory(
+        at: stateDirectoryURL,
+        withIntermediateDirectories: true,
+        attributes: nil
+    )
+}
+
 func getStateURL(_ fileName: String) throws -> URL {
     let stateDirectoryURL: URL = try getStateDirectoryURL()
     let stateFileURL: URL = stateDirectoryURL.appendingPathComponent(fileName)
     return stateFileURL
 }
 
-func saveState(folderId: NSManagedObjectID?, isEditingFolders: Bool, folderBeingEdited: Folder?, isEditingTimers: Bool, timerBeingEdited: Timer? = nil) {
+func saveState(folderId: NSManagedObjectID?, isEditingFolders: Bool, folderBeingEdited: Folder?, isEditingTimers: Bool, timerBeingEdited: Timer? = nil) throws {
     let state: StoredAppState = StoredAppState(
         folderId: folderId?.uriRepresentation() ?? nil,
         isEditingFolders: isEditingFolders,
@@ -67,8 +76,7 @@ func saveState(folderId: NSManagedObjectID?, isEditingFolders: Bool, folderBeing
         try stateToSave.write(to: stateFileURL)
     }
     catch {
-        printWithNewlineAbove(input: "Failed to write state file: \(error)")
-        // EDTODO - Look into logging error details
+        throw StateError.saveFailed(operation: .appState, underlyingError: error)
     }
 }
 
@@ -129,7 +137,7 @@ func getCurrentSavedState(context: NSManagedObjectContext) -> AppStateProps? {
     }
 }
 
-func saveFormState(formData: Data?) {
+func saveFormState(formData: Data?) throws {
     guard let formData else {
         return
     }
@@ -138,7 +146,7 @@ func saveFormState(formData: Data?) {
         try formData.write(to: stateFileURL)
     }
     catch {
-        printWithNewlineAbove(input: "Error occurred whilst saving form data \(error)")
+        throw StateError.saveFailed(operation: .formState, underlyingError: error)
     }
 }
 
@@ -176,13 +184,18 @@ func deleteSavedState() {
     }
 }
 
-func saveAudioState(audioURL: URL?) {
+func saveAudioState(audioURL: URL?) throws {
     guard let audioURL else {
         return
     }
-    saveNotificationSound(
-        fileURL: audioURL,
-        fileName: audioStateFileName,
-        hasAudioChanged: true
-    )
+    do {
+        try saveNotificationSound(
+            fileURL: audioURL,
+            fileName: audioStateFileName,
+            hasAudioChanged: true
+        )
+    }
+    catch {
+        throw StateError.saveFailed(operation: .audioState, underlyingError: error)
+    }
 }

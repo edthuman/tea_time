@@ -22,9 +22,15 @@ struct RecordingDeniedAlertModifier: ViewModifier {
         content
             .alert("Microphone use denied", isPresented: $isPresented) {
                 Button("Change settings", role: .cancel) {
-                    appState.saveCurrentState()
-                    saveFormState(formData: formData)
-                    saveAudioState(audioURL: audioURL)
+                    do {
+                        try createStateDirectory()
+                        try appState.saveCurrentState()
+                        try saveFormState(formData: formData)
+                        try saveAudioState(audioURL: audioURL)
+                    }
+                    catch {
+                        printWithNewlineAbove(input: "Failed to save state: \(error)")
+                    }
                     
                     Task {
                         if let url = URL(string: UIApplication.openSettingsURLString) {

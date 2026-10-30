@@ -36,8 +36,8 @@ class AppState: ObservableObject {
         timerBeingEdited = timer
     }
     
-    func saveCurrentState() {
-        saveState(
+    func saveCurrentState() throws {
+        try saveState(
             folderId: folderId,
             isEditingFolders: isEditingFolders,
             folderBeingEdited: folderBeingEdited,

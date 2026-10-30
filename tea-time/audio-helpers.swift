@@ -67,35 +67,30 @@ func deleteSoundFile(fileName: String) throws {
     }
 }
 
-func saveNotificationSound(fileURL: URL?, fileName: String, hasAudioChanged: Bool) {
+func saveNotificationSound(fileURL: URL?, fileName: String, hasAudioChanged: Bool) throws {
     if hasAudioChanged == false {
         // Prevent re-saving of audio from bookmark when the file is not changed
         return
     }
     
-    do {
-        let soundFileURL: URL = try getSoundFileURL(fileName: fileName)
-            
-        guard let url = fileURL else {
-            // Sound removed from timer
-            try deleteSoundFile(fileName: fileName)
-            return
-        }
+    let soundFileURL: URL = try getSoundFileURL(fileName: fileName)
         
-        if fileManager.fileExists(atPath: soundFileURL.path) {
-            _ = try fileManager.replaceItemAt(
-                soundFileURL,
-                withItemAt: url
-            )
-        } else {
-            try fileManager.copyItem(
-                at: url,
-                to: soundFileURL,
-            )
-        }
+    guard let url = fileURL else {
+        // Sound removed from timer
+        try deleteSoundFile(fileName: fileName)
+        return
     }
-    catch {
-        printWithNewlineAbove(input: "Failed to create audio file:\n \(error)\n")
+    
+    if fileManager.fileExists(atPath: soundFileURL.path) {
+        _ = try fileManager.replaceItemAt(
+            soundFileURL,
+            withItemAt: url
+        )
+    } else {
+        try fileManager.copyItem(
+            at: url,
+            to: soundFileURL,
+        )
     }
 }
 

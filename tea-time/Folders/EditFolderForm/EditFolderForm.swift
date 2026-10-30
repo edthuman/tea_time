@@ -102,7 +102,7 @@ struct EditFolderForm: View {
                 
                 if let folder = folder {
                     let fileName = getFileName(folder)
-                    saveNotificationSound(fileURL: audioURL, fileName: fileName, hasAudioChanged: hasAudioChanged)
+                    try saveNotificationSound(fileURL: audioURL, fileName: fileName, hasAudioChanged: hasAudioChanged)
                 }
                 
                 resetState()
