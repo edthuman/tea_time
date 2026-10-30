@@ -253,70 +253,33 @@ struct EditTimerForm: View {
             let screenHeight = geometry.size.height
             
             CloseButton(close: resetState)
-
-            VStack {
-                FormButtonName(
-                    name: $newTimerName,
-                    textColour: newTextColour,
-                    backgroundColour: newTimerBackground
-                )
-                .frame(maxWidth: screenWidth * 0.39)
-                .padding(.bottom, 10)
                 
-                FormColourPicker(
-                    "Text Colour",
-                    colour: $newTextColour,
+            ScrollView {
+                TimerFormElements(
                     screenWidth: screenWidth,
-                    screenHeight: screenHeight
-                )
-                
-                FormColourPicker(
-                    "Background Colour",
-                    colour: $newTimerBackground,
-                    screenWidth: screenWidth,
-                    screenHeight: screenHeight
-                )
-                
-                HStack (spacing: 20) {
-                    FormNumber(value: $newTimerLength)
-                    
-                    Picker("", selection: $selectedTimePeriod) {
-                        Text(newTimerLength == "1" ? "second" : "seconds")
-                            .tag(TimePeriods.seconds)
-                        Text(newTimerLength == "1" ? "minute" : "minutes")
-                            .tag(TimePeriods.minutes)
-                        Text(newTimerLength == "1" ? "hour" : "hours")
-                            .tag(TimePeriods.hours)
-                    }.fixedSize()
-                }
-                .padding(.vertical, 10)
-                
-                FormAudioPicker(
-                    audioURL: $audioURL,
-                    selectionTooLong: $audioTooLong,
-                    hasChanged: $hasAudioChanged,
+                    screenHeight: screenHeight,
                     recorder: recorder,
+                    saveChanges: saveChanges,
+                    resetState: resetState,
+                    newTimerName: $newTimerName,
+                    newTimerLength: $newTimerLength,
+                    selectedTimePeriod: $selectedTimePeriod,
+                    newTextColour: $newTextColour,
+                    newTimerBackground: $newTimerBackground,
+                    audioURL: $audioURL,
+                    audioTooLong: $audioTooLong,
+                    hasAudioChanged: $hasAudioChanged
                 )
-                .padding(.vertical, 12)
-                
-                FormFinishButtons(
-                    save: saveChanges,
-                    disableSave: recorder.status != RecorderStatus.idle,
-                    cancel: resetState
-                )
-                .padding(.top, 5)
+                .frame(minHeight: screenHeight)
             }
-            .frame(
-                width: screenWidth,
-                height: screenHeight
-            )
-            .audioTooLongAlert(isPresented: $audioTooLong)
-            .recordingDeniedAlert(
-                isPresented: $recorder.recorderDenied,
-                formData: getFormData(),
-                audioURL: hasAudioChanged ? audioURL : nil
-            )
+            .frame(height: screenHeight)
         }
+        .audioTooLongAlert(isPresented: $audioTooLong)
+        .recordingDeniedAlert(
+            isPresented: $recorder.recorderDenied,
+            formData: getFormData(),
+            audioURL: hasAudioChanged ? audioURL : nil
+        )
         .onDisappear {
             if recorder.status == .recording {
                 recorder.stopRecording()
