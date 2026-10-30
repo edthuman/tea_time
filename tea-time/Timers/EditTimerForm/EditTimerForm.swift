@@ -263,11 +263,19 @@ struct EditTimerForm: View {
                 .frame(maxWidth: screenWidth * 0.39)
                 .padding(.bottom, 10)
                 
-                FormColourPicker("Text Colour", colour: $newTextColour)
-                    .frame(width: screenWidth * 0.45)
+                FormColourPicker(
+                    "Text Colour",
+                    colour: $newTextColour,
+                    screenWidth: screenWidth,
+                    screenHeight: screenHeight
+                )
                 
-                FormColourPicker("Background Colour", colour: $newTimerBackground)
-                    .frame(width: screenWidth * 0.45)
+                FormColourPicker(
+                    "Background Colour",
+                    colour: $newTimerBackground,
+                    screenWidth: screenWidth,
+                    screenHeight: screenHeight
+                )
                 
                 HStack (spacing: 20) {
                     FormNumber(value: $newTimerLength)
@@ -300,7 +308,7 @@ struct EditTimerForm: View {
             }
             .frame(
                 width: screenWidth,
-                height: screenHeight * 0.95
+                height: screenHeight
             )
             .audioTooLongAlert(isPresented: $audioTooLong)
             .recordingDeniedAlert(

@@ -1,5 +1,5 @@
 import CoreFoundation
-import SwiftUICore
+import SwiftUI
 
 func getListHeight(_ screenHeight: CGFloat) -> CGFloat {
     return screenHeight > 400 ? screenHeight - 35 : screenHeight - 45

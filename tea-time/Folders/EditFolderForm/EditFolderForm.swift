@@ -228,13 +228,22 @@ struct EditFolderForm: View {
                     backgroundColour: newFolderBackground
                 )
                 .frame(maxWidth: screenWidth * 0.39)
+                .padding(.top, screenWidth < 500 ? 10 : 0)
                 .padding(.bottom, 10)
                 
-                FormColourPicker("Text Colour", colour: $newTextColour)
-                    .frame(width: screenWidth * 0.45)
+                FormColourPicker(
+                    "Text Colour",
+                    colour: $newTextColour,
+                    screenWidth: screenWidth,
+                    screenHeight: screenHeight
+                )
                 
-                FormColourPicker("Background Colour", colour: $newFolderBackground)
-                    .frame(width: screenWidth * 0.45)
+                FormColourPicker(
+                    "Background Colour",
+                    colour: $newFolderBackground,
+                    screenWidth: screenWidth,
+                    screenHeight: screenHeight
+                )
                 
                 FormAudioPicker(
                     audioURL: $audioURL,
@@ -254,7 +263,7 @@ struct EditFolderForm: View {
             }
             .frame(
                 width: screenWidth,
-                height: screenHeight * 0.95
+                height: screenHeight
             )
             .audioTooLongAlert(isPresented: $audioTooLong)
             .recordingDeniedAlert(
