@@ -41,12 +41,6 @@ func getStateDirectoryURL() throws -> URL {
         throw FileDirectoryErrors.applicationSupportDirectoryNotFound
     }
     let stateDirectoryURL: URL = appSupportURL.appendingPathComponent("State")
-
-    try fileManager.createDirectory(
-        at: stateDirectoryURL,
-        withIntermediateDirectories: true,
-        attributes: nil
-    )
     return stateDirectoryURL
 }
 
@@ -167,27 +161,18 @@ func getSavedFolderState<T: Codable & HasFormType>(as: T.Type, formType: FormTyp
 
 func deleteSavedState() {
     do {
-        let appStateURL: URL = try getStateURL(stateFileName)
-        try fileManager.removeItem(at: appStateURL)
+        let stateDirectoryURL: URL = try getStateDirectoryURL()
+        try fileManager.removeItem(at: stateDirectoryURL)
     }
     catch {
-        printWithNewlineAbove(input: "App state failed to delte \(error)")
-    }
-    
-    do {
-        let formStateURL = try getStateURL(formStateFileName)
-        try fileManager.removeItem(at: formStateURL)
-    }
-    catch {
-        printWithNewlineAbove(input: "Form state failed to delete \(error)")
-    }
-    
-    do {
-        let audioStateURL = try getStateURL(audioStateFileName)
-        try fileManager.removeItem(at: audioStateURL)
-    }
-    catch {
-        printWithNewlineAbove(input: "Audio state file failed to delete \(error)")
+        if error as? FileDirectoryErrors == .applicationSupportDirectoryNotFound {
+            return
+        }
+        
+        let cocoaError = error as? CocoaError
+        if cocoaError?.code != CocoaError.fileNoSuchFile {
+            printWithNewlineAbove(input: "Error occurred whilst deleting app state \(error)")
+        }
     }
 }
 
