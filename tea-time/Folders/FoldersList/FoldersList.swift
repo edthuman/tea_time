@@ -7,35 +7,39 @@ struct FoldersList: View {
     
     let folders: FetchedResults<Folder>
     
-    var body: some View {
-        VStack (spacing: 20) {
-            ForEach(folders) { (folder: Folder) in
-                if (state.isEditingFolders) {
-                    HStack {
-                        FolderButton(folder: folder)
-                        
-                        Button {
-                            state.setFolderBeingEdited(folder)
-                            showEditFolderForm = true
-                        } label: {
-                            Image(systemName: "square.and.pencil")
-                                .foregroundStyle(.blue)
-                                .padding(.horizontal, 10)
+    var body: some View {        
+        GeometryReader { geometry in
+            let screenWidth = geometry.size.width
+            
+            VStack (spacing: 20) {
+                ForEach(folders) { (folder: Folder) in
+                    if (state.isEditingFolders) {
+                        HStack {
+                            FolderButton(folder: folder, screenWidth: screenWidth)
+                            
+                            Button {
+                                state.setFolderBeingEdited(folder)
+                                showEditFolderForm = true
+                            } label: {
+                                Image(systemName: "square.and.pencil")
+                                    .foregroundStyle(.blue)
+                                    .padding(.horizontal, 10)
+                            }
+                            
+                            Button {
+                                state.setFolderBeingEdited(folder)
+                                showDelete = true
+                            } label: {
+                                Image(systemName: "trash")
+                                    .foregroundStyle(.red)
+                            }
                         }
-                        
-                        Button {
-                            state.setFolderBeingEdited(folder)
-                            showDelete = true
-                        } label: {
-                            Image(systemName: "trash")
-                                .foregroundStyle(.red)
-                        }
+                    } else {
+                        FolderButton(folder: folder, screenWidth: screenWidth)
                     }
-                } else {
-                    FolderButton(folder: folder)
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(maxWidth: .infinity)
     }
 }

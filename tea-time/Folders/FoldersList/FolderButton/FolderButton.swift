@@ -3,7 +3,7 @@ import CoreData
 
 struct FolderButton: View {
     @ObservedObject var folder: Folder
-    let screenWidth = UIScreen.main.bounds.width
+    let screenWidth: CGFloat
     
     var folderId: NSManagedObjectID {
         folder.objectID
@@ -21,7 +21,7 @@ struct FolderButton: View {
                 .foregroundStyle(
                     Color(red: folder.textRed, green: folder.textGreen, blue: folder.textBlue))
                 .fontWeight(.bold)
-                .frame(maxWidth: screenWidth * 0.3)
+                .frame(width: screenWidth * 0.3)
                 .padding(20)
         }
         .background(
