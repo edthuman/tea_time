@@ -152,7 +152,7 @@ struct EditFolderForm: View {
     }
     
     init(isPresented: Binding<Bool>) {
-        let savedFormState = getSavedFolderState(as: FolderFormData.self, formType: FormType.Folder)
+        let savedFormState = getSavedFormState(as: FolderFormData.self, formType: FormType.Folder)
         if let savedFormState {
             self._isPresented = isPresented
             

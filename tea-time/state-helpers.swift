@@ -89,8 +89,8 @@ func getStateFromJSON(context: NSManagedObjectContext, data: Data?) throws -> Ap
     let state: StoredAppState = try JSONDecoder.decode(StoredAppState.self, from: data)
     
     let folderId: NSManagedObjectID? = getObjectIDFromUri(context: context, uri: state.folderId)
-    let folderBeingEdited: NSManagedObject? = getObjectFromIDUri(context: context, uri: state.folderBeingEditedIdUri)
-    let timerBeingEdited: NSManagedObject? = getObjectFromIDUri(context: context, uri: state.timerBeingEditedIdUri)
+    let folderBeingEdited: NSManagedObject? = getObjectFromIDUri(context: context, uri: state.folderBeingEditedIdUri, objectType: .Folder)
+    let timerBeingEdited: NSManagedObject? = getObjectFromIDUri(context: context, uri: state.timerBeingEditedIdUri, objectType: .Timer)
     
     return AppStateProps(
         folderId: folderId,
@@ -111,7 +111,7 @@ func getObjectIDFromUri(context: NSManagedObjectContext, uri: URL?) -> NSManaged
     return id
 }
 
-func getObjectFromIDUri(context: NSManagedObjectContext, uri: URL?) -> NSManagedObject? {
+func getObjectFromIDUri(context: NSManagedObjectContext, uri: URL?, objectType: FormType) -> NSManagedObject? {
     let objectID = getObjectIDFromUri(context: context, uri: uri)
     guard let objectID else {
         return nil
@@ -120,6 +120,7 @@ func getObjectFromIDUri(context: NSManagedObjectContext, uri: URL?) -> NSManaged
         return try context.existingObject(with: objectID)
     }
     catch {
+        logStateError(error, context: "fetching\(objectType.rawValue)FromState")
         return nil
     }
 }
@@ -131,8 +132,10 @@ func getCurrentSavedState(context: NSManagedObjectContext) -> AppStateProps? {
         return try getStateFromJSON(context: context, data: stateFile)
     }
     catch {
-        let nsError = error as NSError
-        printWithNewlineAbove(input: "State file not found \(nsError), \(nsError.userInfo)")
+        let isMissingStateFile = isErrorMissingStateFile(error: error)
+        if !isMissingStateFile {
+            logStateError(error, context: "fetchingSavedAppState")
+        }
         return nil
     }
 }
@@ -150,7 +153,7 @@ func saveFormState(formData: Data?) throws {
     }
 }
 
-func getSavedFolderState<T: Codable & HasFormType>(as: T.Type, formType: FormType) -> T? {
+func getSavedFormState<T: Codable & HasFormType>(as: T.Type, formType: FormType) -> T? {
     do {
         let stateDirectoryURL: URL = try getStateDirectoryURL()
         let stateFileURL: URL = stateDirectoryURL.appendingPathComponent(formStateFileName)
@@ -163,6 +166,10 @@ func getSavedFolderState<T: Codable & HasFormType>(as: T.Type, formType: FormTyp
         return nil
     }
     catch {
+        let isMissingStateFile = isErrorMissingStateFile(error: error)
+        if !isMissingStateFile {
+            logStateError(error, context: "fetchingSavedFormState")
+        }
         return nil
     }
 }
@@ -173,15 +180,23 @@ func deleteSavedState() {
         try fileManager.removeItem(at: stateDirectoryURL)
     }
     catch {
-        if error as? FileDirectoryErrors == .applicationSupportDirectoryNotFound {
-            return
-        }
-        
-        let cocoaError = error as? CocoaError
-        if cocoaError?.code != CocoaError.fileNoSuchFile {
+        let isMissingStateFile = isErrorMissingStateFile(error: error)
+        if !isMissingStateFile {
             logStateError(error, context: "deletingAppState")
         }
     }
+}
+
+func isErrorMissingStateFile(error: Error) -> Bool {
+    if error as? FileDirectoryErrors == .applicationSupportDirectoryNotFound {
+        return true
+    }
+    
+    let cocoaError = error as? CocoaError
+    if cocoaError?.code == CocoaError.fileNoSuchFile {
+        return true
+    }
+    return false
 }
 
 func saveAudioState(audioURL: URL?) throws {

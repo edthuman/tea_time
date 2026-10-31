@@ -174,7 +174,7 @@ struct EditTimerForm: View {
     }
     
     init(isPresented: Binding<Bool>) {
-        let savedFormState = getSavedFolderState(as: TimerFormData.self, formType: FormType.Timer)
+        let savedFormState = getSavedFormState(as: TimerFormData.self, formType: FormType.Timer)
         if let savedFormState {
             self._isPresented = isPresented
             

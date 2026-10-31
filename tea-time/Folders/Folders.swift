@@ -19,7 +19,7 @@ struct Folders: View {
     private var folders: FetchedResults<Folder>
     
     init() {
-        if getSavedFolderState(as: FolderFormData.self, formType: FormType.Folder) != nil {
+        if getSavedFormState(as: FolderFormData.self, formType: FormType.Folder) != nil {
             _showEditFolderForm = State(initialValue: true)
         }
     }

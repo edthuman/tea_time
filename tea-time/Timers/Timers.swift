@@ -35,7 +35,7 @@ struct Timers: View {
             predicate: NSPredicate(format: "folder == %@", folderId)
         )
         
-        if getSavedFolderState(as: TimerFormData.self, formType: FormType.Timer) != nil {
+        if getSavedFormState(as: TimerFormData.self, formType: FormType.Timer) != nil {
             _showEditTimerForm = State(initialValue: true)
         }
     }
