@@ -179,7 +179,7 @@ func deleteSavedState() {
         
         let cocoaError = error as? CocoaError
         if cocoaError?.code != CocoaError.fileNoSuchFile {
-            printWithNewlineAbove(input: "Error occurred whilst deleting app state \(error)")
+            logStateError(error, context: "deletingAppState")
         }
     }
 }
