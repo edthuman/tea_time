@@ -29,7 +29,13 @@ struct RecordingDeniedAlertModifier: ViewModifier {
                         try saveAudioState(audioURL: audioURL)
                     }
                     catch {
-                        printWithNewlineAbove(input: "Failed to save state: \(error)")
+                        guard let stateError = error as? StateError else {
+                            // Only createStateDirectory should be throwing errors that aren't StateErrors
+                            logStateError(error, context: "creatingStateDirectory")
+                            return
+                        }
+                        
+                        logStateError(stateError.underlyingError, context: "\(stateError.operation)")
                     }
                     
                     Task {
