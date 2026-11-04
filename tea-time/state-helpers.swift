@@ -132,7 +132,7 @@ func getCurrentSavedState(context: NSManagedObjectContext) -> AppStateProps? {
         return try getStateFromJSON(context: context, data: stateFile)
     }
     catch {
-        let isMissingStateFile = isErrorMissingStateFile(error: error)
+        let isMissingStateFile = isErrorMissingStateFile(error)
         if !isMissingStateFile {
             logStateError(error, context: "fetchingSavedAppState")
         }
@@ -166,7 +166,7 @@ func getSavedFormState<T: Codable & HasFormType>(as: T.Type, formType: FormType)
         return nil
     }
     catch {
-        let isMissingStateFile = isErrorMissingStateFile(error: error)
+        let isMissingStateFile = isErrorMissingStateFile(error)
         if !isMissingStateFile {
             logStateError(error, context: "fetchingSavedFormState")
         }
@@ -180,14 +180,14 @@ func deleteSavedState() {
         try fileManager.removeItem(at: stateDirectoryURL)
     }
     catch {
-        let isMissingStateFile = isErrorMissingStateFile(error: error)
+        let isMissingStateFile = isErrorMissingStateFile(error)
         if !isMissingStateFile {
             logStateError(error, context: "deletingAppState")
         }
     }
 }
 
-func isErrorMissingStateFile(error: Error) -> Bool {
+func isErrorMissingStateFile(_ error: Error) -> Bool {
     if error as? FileDirectoryErrors == .applicationSupportDirectoryNotFound {
         return true
     }
