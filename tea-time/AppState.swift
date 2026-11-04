@@ -47,4 +47,4 @@ class AppState: ObservableObject {
     }
 }
 
-var appState = AppState()
+let appState = AppState()
