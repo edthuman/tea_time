@@ -41,7 +41,7 @@ func getItemSoundURL(_ item: NSManagedObject?) -> URL? {
         }
     }
     catch {
-        printWithNewlineAbove(input: "Error initialising sound file URL")
+        logAudioError(error, context: "initialisingSoundFileURL")
     }
     return nil
 }
@@ -100,9 +100,7 @@ func checkSoundFileExists(fileName: String) -> Bool {
         return fileManager.fileExists(atPath: soundFileURL.path)
     }
     catch {
-        // Add proper error handling
-        let nsError = error as NSError
-        printWithNewlineAbove(input: "Error occurred whilst checking if sound file exists \(nsError), \(nsError.userInfo)")
+        logAudioError(error, context: "checkingSoundFileExists")
         return false
     }
 }
@@ -113,7 +111,7 @@ func clearTemporaryDirectory() {
         temporaryFiles = try fileManager.contentsOfDirectory(at: fileManager.temporaryDirectory, includingPropertiesForKeys: nil)
     }
     catch {
-        printWithNewlineAbove(input: "Failed to fetch temporary files: \(error)")
+        logTemporaryFileError(error, context: "fetchingTemporaryFiles")
     }
     
     for file in temporaryFiles {
@@ -121,7 +119,7 @@ func clearTemporaryDirectory() {
             try fileManager.removeItem(at: file)
         }
         catch {
-            printWithNewlineAbove(input: "Failed to remove temporary file \(file): \(error)")
+            logTemporaryFileError(error, context: "removingTemporaryFiles")
         }
     }
 }
