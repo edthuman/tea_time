@@ -10,18 +10,18 @@ class AudioPlayerManager: NSObject, ObservableObject, AVAudioPlayerDelegate {
         if currentPlayingURL != nil {
             cleanUpAudioResources()
         }
-        currentPlayingURL = url
         
-        try? AVAudioSession.sharedInstance().setActive(true)
-
         do {
-            isPlaying = true
+            try AVAudioSession.sharedInstance().setActive(true)
             audioPlayer = try AVAudioPlayer(contentsOf: url)
             audioPlayer?.delegate = self
             audioPlayer?.prepareToPlay()
             audioPlayer?.play()
+            
+            currentPlayingURL = url
+            isPlaying = true
         } catch {
-            print("Playback failed: \(error.localizedDescription)")
+            logAudioError(error, context: "playingAudio")
         }
     }
     
