@@ -193,7 +193,8 @@ func isErrorMissingStateFile(_ error: Error) -> Bool {
     }
     
     let cocoaError = error as? CocoaError
-    if cocoaError?.code == CocoaError.fileNoSuchFile {
+    if cocoaError?.code == CocoaError.fileNoSuchFile
+    || cocoaError?.code == CocoaError.fileReadNoSuchFile {
         return true
     }
     return false
