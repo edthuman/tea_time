@@ -43,7 +43,7 @@ func beginTimer(length: Double, timer: Timer) async {
         try await notificationCenter.add(startNotif)
         try await notificationCenter.add(endNotif)
     } catch {
-        printWithNewlineAbove(input: "Error adding notification: \(error)")
+        logNotificationError(error, context: "addingTimerNotifications")
     }
 }
 

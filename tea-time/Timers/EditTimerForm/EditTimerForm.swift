@@ -121,10 +121,7 @@ struct EditTimerForm: View {
 
                 resetState()
             } catch {
-                // EDTODO - Replace this implementation with code to handle the error appropriately.
-                // fatalError terminates the app and creates a crash log
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+                logTimerError(error, context: "savingChanges")
             }
         }
     }
@@ -169,6 +166,7 @@ struct EditTimerForm: View {
             return data
         }
         catch {
+            logTimerError(error, context: "encodingFormData")
             return nil
         }
     }
@@ -201,6 +199,7 @@ struct EditTimerForm: View {
                     _hasAudioChanged = State(initialValue: true)
                     _audioURL = State(initialValue: audioURL)
                 } catch {
+                    logTimerError(error, context: "gettingAudioURL")
                     _hasAudioChanged = State(initialValue: false)
                     intialiseTimerFileURL()
                 }

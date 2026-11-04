@@ -95,10 +95,7 @@ struct Timers: View {
                             try deleteSoundFile(fileName: fileName)
                             try viewContext.save()
                         } catch {
-                            // EDTODO - Replace this implementation with code to handle the error appropriately.
-                            // fatalError terminates the app and creates a crash log
-                            let nsError = error as NSError
-                            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+                            logTimerError(error, context: "deletingTimer")
                         }
                     }
                 }
