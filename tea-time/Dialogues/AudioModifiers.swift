@@ -22,9 +22,21 @@ struct RecordingDeniedAlertModifier: ViewModifier {
         content
             .alert("Microphone use denied", isPresented: $isPresented) {
                 Button("Change settings", role: .cancel) {
-                    appState.saveCurrentState()
-                    saveFormState(formData: formData)
-                    saveAudioState(audioURL: audioURL)
+                    do {
+                        try createStateDirectory()
+                        try appState.saveCurrentState()
+                        try saveFormState(formData: formData)
+                        try saveAudioState(audioURL: audioURL)
+                    }
+                    catch {
+                        guard let stateError = error as? StateError else {
+                            // Only createStateDirectory should be throwing errors that aren't StateErrors
+                            logStateError(error, context: "creatingStateDirectory")
+                            return
+                        }
+                        
+                        logStateError(stateError.underlyingError, context: "\(stateError.operation)")
+                    }
                     
                     Task {
                         if let url = URL(string: UIApplication.openSettingsURLString) {

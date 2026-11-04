@@ -41,7 +41,7 @@ func getItemSoundURL(_ item: NSManagedObject?) -> URL? {
         }
     }
     catch {
-        printWithNewlineAbove(input: "Error initialising sound file URL")
+        logAudioError(error, context: "initialisingSoundFileURL")
     }
     return nil
 }
@@ -67,35 +67,30 @@ func deleteSoundFile(fileName: String) throws {
     }
 }
 
-func saveNotificationSound(fileURL: URL?, fileName: String, hasAudioChanged: Bool) {
+func saveNotificationSound(fileURL: URL?, fileName: String, hasAudioChanged: Bool) throws {
     if hasAudioChanged == false {
         // Prevent re-saving of audio from bookmark when the file is not changed
         return
     }
     
-    do {
-        let soundFileURL: URL = try getSoundFileURL(fileName: fileName)
-            
-        guard let url = fileURL else {
-            // Sound removed from timer
-            try deleteSoundFile(fileName: fileName)
-            return
-        }
+    let soundFileURL: URL = try getSoundFileURL(fileName: fileName)
         
-        if fileManager.fileExists(atPath: soundFileURL.path) {
-            _ = try fileManager.replaceItemAt(
-                soundFileURL,
-                withItemAt: url
-            )
-        } else {
-            try fileManager.copyItem(
-                at: url,
-                to: soundFileURL,
-            )
-        }
+    guard let url = fileURL else {
+        // Sound removed from timer
+        try deleteSoundFile(fileName: fileName)
+        return
     }
-    catch {
-        printWithNewlineAbove(input: "Failed to create audio file:\n \(error)\n")
+    
+    if fileManager.fileExists(atPath: soundFileURL.path) {
+        _ = try fileManager.replaceItemAt(
+            soundFileURL,
+            withItemAt: url
+        )
+    } else {
+        try fileManager.copyItem(
+            at: url,
+            to: soundFileURL,
+        )
     }
 }
 
@@ -105,9 +100,7 @@ func checkSoundFileExists(fileName: String) -> Bool {
         return fileManager.fileExists(atPath: soundFileURL.path)
     }
     catch {
-        // Add proper error handling
-        let nsError = error as NSError
-        printWithNewlineAbove(input: "Error occurred whilst checking if sound file exists \(nsError), \(nsError.userInfo)")
+        logAudioError(error, context: "checkingSoundFileExists")
         return false
     }
 }
@@ -118,7 +111,7 @@ func clearTemporaryDirectory() {
         temporaryFiles = try fileManager.contentsOfDirectory(at: fileManager.temporaryDirectory, includingPropertiesForKeys: nil)
     }
     catch {
-        printWithNewlineAbove(input: "Failed to fetch temporary files: \(error)")
+        logTemporaryFileError(error, context: "fetchingTemporaryFiles")
     }
     
     for file in temporaryFiles {
@@ -126,7 +119,7 @@ func clearTemporaryDirectory() {
             try fileManager.removeItem(at: file)
         }
         catch {
-            printWithNewlineAbove(input: "Failed to remove temporary file \(file): \(error)")
+            logTemporaryFileError(error, context: "removingTemporaryFiles")
         }
     }
 }

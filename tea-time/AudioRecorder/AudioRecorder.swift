@@ -41,10 +41,10 @@ class AudioRecorder {
         let session = AVAudioSession.sharedInstance()
         
         do {
-        try session.setActive(true)
+            try session.setActive(true)
 
-        let format = engine.inputNode.outputFormat(forBus: 0)
-        maximumFrames = AVAudioFrameCount(30.0 * format.sampleRate)
+            let format = engine.inputNode.outputFormat(forBus: 0)
+            maximumFrames = AVAudioFrameCount(30.0 * format.sampleRate)
         
             audioFile = try AVAudioFile(
                 forWriting: outputURL,
@@ -82,15 +82,18 @@ class AudioRecorder {
                             }
                         }
                     } catch {
-                        printWithNewlineAbove(input: "Failed to write to file: \(error)")
+                        logAudioError(error, context: "writingToRecordingFile")
+                        DispatchQueue.main.async {
+                            self.stopRecording()
+                        }
                     }
                 }
             )
             try engine.start()
             status = RecorderStatus.recording
         } catch {
+            logAudioError(error, context: "settingUpAudioEngine")
             status = RecorderStatus.idle
-            print("Failed to create file: \(error)")
             return
         }
     }

@@ -19,7 +19,7 @@ struct Folders: View {
     private var folders: FetchedResults<Folder>
     
     init() {
-        if getSavedFolderState(as: FolderFormData.self, formType: FormType.Folder) != nil {
+        if getSavedFormState(as: FolderFormData.self, formType: FormType.Folder) != nil {
             _showEditFolderForm = State(initialValue: true)
         }
     }
@@ -77,10 +77,7 @@ struct Folders: View {
                         viewContext.delete(folder)
                         try viewContext.save()
                     } catch {
-                        // EDTODO - Replace this implementation with code to handle the error appropriately.
-                        // fatalError terminates the app and creates a crash log
-                        let nsError = error as NSError
-                        fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+                        logFolderError(error, context: "deletingFolder")
                     }
                 }
             }

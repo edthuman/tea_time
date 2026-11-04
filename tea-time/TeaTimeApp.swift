@@ -4,7 +4,7 @@ import SwiftUI
 private let notificationDelegate = NotificationDelegate()
 
 @main
-struct tea_timeApp: App {
+struct TeaTimeApp: App {
     let persistenceController = PersistenceController.shared
     
     init () {
@@ -16,18 +16,14 @@ struct tea_timeApp: App {
                 options: [.defaultToSpeaker, .allowBluetooth]
             )
         } catch {
-            printWithNewlineAbove(
-                input: "Failed to configure audio session: \(error)"
-            )
+            logAudioError(error, context: "configuringAudioSession")
         }
         
         UNUserNotificationCenter.current().delegate = notificationDelegate
         
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { success, error in
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { _, error in
             if let error = error {
-                print("Permission request failed: \(error.localizedDescription)")
-            } else {
-                print("Permission granted: \(success)")
+                logPermissionError(error, context: "requestingNotificationPermission")
             }
         }
     }
