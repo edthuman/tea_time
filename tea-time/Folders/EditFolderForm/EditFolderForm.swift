@@ -107,10 +107,7 @@ struct EditFolderForm: View {
                 
                 resetState()
             } catch {
-                // EDTODO - Replace this implementation with code to handle the error appropriately.
-                // fatalError terminates the app and creates a crash log
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+                logFolderError(error, context: "savingChanges")
             }
         }
     }
@@ -147,6 +144,7 @@ struct EditFolderForm: View {
             return data
         }
         catch {
+            logFolderError(error, context: "encodingFormData")
             return nil
         }
     }
@@ -177,6 +175,7 @@ struct EditFolderForm: View {
                     _hasAudioChanged = State(initialValue: true)
                     _audioURL = State(initialValue: audioURL)
                 } catch {
+                    logFolderError(error, context: "gettingAudioURL")
                     _hasAudioChanged = State(initialValue: false)
                     intialiseFolderFileURL()
                 }
